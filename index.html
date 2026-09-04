@@ -385,7 +385,7 @@
       background: linear-gradient(165deg, #ffffff 0%, #f1f5f9 100%);
       border: 2px solid #334155;
       border-radius: 12px;
-      padding: 6px 4px 6px 4px;
+      padding: 6px 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -394,6 +394,11 @@
       min-height: clamp(95px, 14vh, 130px);
       box-shadow: 0 4px 0 #0f172a;
       transition: all 0.12s;
+    }
+
+    .starter-card.boss-pet {
+      border: 2.5px solid #f59e0b;
+      background: linear-gradient(165deg, #fffbeb 0%, #fed7aa 100%);
     }
 
     .starter-card.active {
@@ -445,6 +450,7 @@
     .tag-psychic { background: linear-gradient(135deg, #ec4899, #be185d); }
     .tag-grass { background: linear-gradient(135deg, #10b981, #047857); }
     .tag-water { background: linear-gradient(135deg, #0284c7, #0369a1); }
+    .tag-boss { background: linear-gradient(135deg, #f59e0b, #d97706); }
 
     .stage-list {
       display: flex;
@@ -514,6 +520,24 @@
       border-bottom: 3px solid #0f172a;
       overflow: hidden;
     }
+
+    .combo-badge {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: linear-gradient(135deg, #ef4444, #f59e0b);
+      color: #ffffff;
+      font-size: clamp(11px, 1.7vh, 14px);
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 16px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      z-index: 25;
+      display: none;
+      animation: comboPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes comboPop { 0% { transform: scale(0.6); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
     .hud {
       position: absolute;
@@ -734,6 +758,13 @@
       background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.95) 15%, rgba(245, 158, 11, 0.95) 50%, rgba(16, 185, 129, 0.95) 85%, transparent);
       box-shadow: 0 0 25px rgba(251, 191, 36, 0.8);
     }
+    .feedback-banner.critical {
+      background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.95) 15%, rgba(245, 158, 11, 0.95) 50%, rgba(139, 92, 246, 0.95) 85%, transparent);
+      box-shadow: 0 0 35px rgba(245, 158, 11, 1);
+      animation: critFlow 1.2s infinite linear;
+    }
+    @keyframes critFlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+
     .feedback-banner.wrong { 
       background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.95) 20%, rgba(239, 68, 68, 0.95) 80%, transparent); 
     }
@@ -759,6 +790,77 @@
     .blink { animation: blink 0.12s ease-in-out 3; }
     @keyframes shake { 10%, 90% { transform: translate3d(-4px, 0, 0); } 30%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
     @keyframes blink { 50% { opacity: 0.1; filter: brightness(4); } }
+
+    /* 金幣掉落粒子特效 */
+    .coin-particle {
+      position: absolute;
+      font-size: 24px;
+      z-index: 50;
+      pointer-events: none;
+      animation: coinFall 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    @keyframes coinFall {
+      0% { transform: translate(0, 0) scale(0.5) rotate(0deg); opacity: 1; }
+      50% { transform: translate(var(--tx), -60px) scale(1.3) rotate(180deg); opacity: 1; }
+      100% { transform: translate(var(--tx), 120px) scale(0.8) rotate(360deg); opacity: 0; }
+    }
+
+    /* 捕獲神獸動畫 Overlay */
+    .catch-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(13, 27, 42, 0.95);
+      z-index: 95;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pokeball-anim {
+      width: 100px;
+      height: 100px;
+      position: relative;
+    }
+
+    .ball-wobble-success {
+      animation: wobble 0.6s ease-in-out 3;
+    }
+    .ball-wobble-fail {
+      animation: wobble 0.6s ease-in-out 2;
+    }
+    @keyframes wobble {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-25deg); }
+      75% { transform: rotate(25deg); }
+    }
+
+    .catch-title {
+      font-size: clamp(18px, 3.2vh, 26px);
+      color: #fbbf24;
+      font-weight: 900;
+      text-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    .catch-btn {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 25px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #047857;
+      display: none;
+    }
+    .catch-btn.fail {
+      background: #ef4444;
+      box-shadow: 0 4px 0 #b91c1c;
+    }
 
     /* ================= 4. 皮卡丘救援提示 Overlay ================= */
     .hint-overlay {
@@ -1070,21 +1172,25 @@
     .btn-back { background: #64748b; }
 
     @media (max-width: 768px) {
-      .menu-columns {
-        flex-direction: column;
-      }
-      .menu-right {
-        max-height: 140px;
-      }
-      .map-regions-grid {
-        gap: 8px;
-      }
+      .menu-columns { flex-direction: column; }
+      .menu-right { max-height: 140px; }
+      .map-regions-grid { gap: 8px; }
     }
   </style>
 </head>
 <body>
 
 <div class="game-container">
+  <!-- 抓寶判定 Overlay (功能 1: 90% 判定與年級隔離) -->
+  <div id="catch-overlay" class="catch-overlay">
+    <div id="catch-title" class="catch-title">✨ 魔王倒下了！進入捕獲階段！ ✨</div>
+    <div id="catch-ball-box" class="pokeball-anim">
+      <img id="pokeball-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" style="width:100%; height:100%; object-fit:contain;" alt="精靈球" />
+    </div>
+    <div id="catch-result-txt" style="color:#ffffff; font-size:15px; font-weight:bold; text-align:center; padding:0 10px;">投擲精靈球中...</div>
+    <button id="catch-done-btn" class="catch-btn" onclick="finishCatchModal()">收服成功！加入夥伴！</button>
+  </div>
+
   <!-- 皮卡丘救援提示 Overlay -->
   <div id="hint-overlay" class="hint-overlay">
     <div class="hint-card">
@@ -1199,9 +1305,11 @@
       <path d="M780 180 Q830 165 880 180 T980 180" stroke="rgba(255,255,255,0.15)" stroke-width="2" fill="none" />
       <path d="M100 620 Q150 605 200 620 T300 620" stroke="rgba(255,255,255,0.15)" stroke-width="2" fill="none" />
 
+      <!-- 卡洛斯島嶼點擊區域 -->
       <path d="M 50 200 C 120 130, 260 110, 360 150 C 440 180, 470 270, 430 360 C 400 420, 450 510, 370 580 C 250 640, 130 610, 70 510 C 30 430, 10 280, 50 200 Z" 
             fill="url(#johtoLand)" stroke="#1b4332" stroke-width="6" style="cursor:pointer;" onclick="selectRegion('kalos')" />
       
+      <!-- 關東島嶼點擊區域 -->
       <path d="M 530 150 C 630 110, 790 120, 890 170 C 970 220, 990 350, 930 440 C 870 520, 900 610, 810 610 C 690 610, 570 570, 510 470 C 470 390, 460 220, 530 150 Z" 
             fill="url(#kantoLand)" stroke="#6c4033" stroke-width="6" style="cursor:pointer;" onclick="selectRegion('kanto')" />
 
@@ -1217,11 +1325,13 @@
       <circle cx="720" cy="370" r="12" fill="#3b82f6" stroke="#fff" stroke-width="3" style="cursor:pointer;" onclick="selectRegion('kanto')" />
       <circle cx="780" cy="510" r="12" fill="#3b82f6" stroke="#fff" stroke-width="3" style="cursor:pointer;" onclick="selectRegion('kanto')" />
 
+      <!-- 卡洛斯按鈕標籤 -->
       <g transform="translate(140, 220)" style="cursor:pointer;" onclick="selectRegion('kalos')">
         <rect x="0" y="0" width="170" height="42" rx="21" fill="rgba(13, 27, 42, 0.88)" stroke="#fbbf24" stroke-width="2.5" />
         <text x="85" y="27" font-size="16" font-weight="900" fill="#ffffff" text-anchor="middle" id="svg-map-txt-kalos">🏯 卡洛斯 (下學期)</text>
       </g>
 
+      <!-- 關東按鈕標籤 -->
       <g transform="translate(680, 220)" style="cursor:pointer;" onclick="selectRegion('kanto')">
         <rect x="0" y="0" width="170" height="42" rx="21" fill="rgba(13, 27, 42, 0.88)" stroke="#fbbf24" stroke-width="2.5" />
         <text x="85" y="27" font-size="16" font-weight="900" fill="#ffffff" text-anchor="middle" id="svg-map-txt-kanto">⚡ 關東 (上學期)</text>
@@ -1287,33 +1397,7 @@
     <div class="menu-columns">
       <div class="menu-left">
         <div class="section-title">⭐ 1. 選擇你的出戰寶可夢：</div>
-        <div class="starter-group">
-          <div class="starter-card active" onclick="selectStarter('ceruledge')">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/935.png" alt="炭小侍" />
-            <span>炭小侍 (20題)</span>
-            <span class="starter-type-tag tag-fire">二擇分支</span>
-          </div>
-          <div class="starter-card" onclick="selectStarter('charizard')">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png" alt="火恐龍" />
-            <span>火恐龍 (30題)</span>
-            <span class="starter-type-tag tag-fire">火/龍系</span>
-          </div>
-          <div class="starter-card" onclick="selectStarter('gardevoir')">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/280.png" alt="拉魯拉絲" />
-            <span>拉魯拉絲 (30題)</span>
-            <span class="starter-type-tag tag-psychic">超能/妖精</span>
-          </div>
-          <div class="starter-card" onclick="selectStarter('sprigatito')">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/906.png" alt="新葉喵" />
-            <span>新葉喵 (30題)</span>
-            <span class="starter-type-tag tag-grass">草/惡系</span>
-          </div>
-          <div class="starter-card" onclick="selectStarter('froakie')">
-            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/656.png" alt="呱呱泡蛙" />
-            <span>呱呱泡蛙 (30題)</span>
-            <span class="starter-type-tag tag-water">水/惡系</span>
-          </div>
-        </div>
+        <div class="starter-group" id="starter-group-container"></div>
 
         <div class="section-title">🚩 2. 選擇挑戰關卡：</div>
         <div class="stage-list" id="stage-list-container"></div>
@@ -1333,13 +1417,14 @@
 
   <!-- 3. 戰鬥畫面、魔王立繪與計算黑板 -->
   <div id="battle-screen" class="battle-screen">
-    <div class="battle-stage">
+    <div class="battle-stage" id="battle-stage-area">
+      <div id="combo-badge" class="combo-badge">🔥 3 COMBO！</div>
       <div id="feedback-banner" class="feedback-banner">✓ 正確！</div>
 
       <div id="spell-opp" class="spell-effect" style="top: 25px; right: 70px;">⚡</div>
       <div id="spell-player" class="spell-effect" style="bottom: 25px; left: 70px;">💥</div>
 
-      <div class="hud opponent">
+      <div class="hud opponent" id="opp-hud">
         <div class="hud-header">
           <span id="opp-name">-</span>
           <span id="opp-type" class="type-pill" style="background:#64748b;">屬性</span>
@@ -1403,7 +1488,6 @@
           <div style="font-weight:bold; color:#fbbf24; text-align:left; font-size:12px;">📝 錯題回顧與解析：</div>
           <div class="review-section" id="review-list"></div>
 
-          <!-- 成績登錄區：無論勝負皆可登錄 -->
           <div id="rank-record-sec">
             <div class="record-input-group">
               <input type="text" id="player-nickname" class="name-input" placeholder="請輸入大名" maxlength="6" />
@@ -1485,6 +1569,24 @@
     playSynthTone(659.25, "triangle", 0.12, 0.08, 0.2);
     playSynthTone(783.99, "triangle", 0.12, 0.16, 0.2);
     playSynthTone(1046.50, "square", 0.25, 0.24, 0.25);
+  }
+
+  function playCriticalSE() {
+    playSynthTone(440, "sawtooth", 0.1, 0, 0.25);
+    playSynthTone(880, "square", 0.12, 0.06, 0.3);
+    playSynthTone(1320, "triangle", 0.15, 0.12, 0.3);
+    playSynthTone(1760, "sine", 0.3, 0.18, 0.35);
+  }
+
+  function playCatchSE() {
+    playSynthTone(400, "sine", 0.15, 0, 0.2);
+    playSynthTone(600, "sine", 0.2, 0.15, 0.25);
+    playSynthTone(900, "square", 0.3, 0.3, 0.3);
+  }
+
+  function playCatchFailSE() {
+    playSynthTone(300, "sawtooth", 0.2, 0, 0.2);
+    playSynthTone(200, "sawtooth", 0.3, 0.15, 0.25);
   }
 
   function playPikaThunderSE() {
@@ -1573,7 +1675,7 @@
     normal: "#64748b"
   };
 
-  const STARTERS_DATA = {
+  const BASE_STARTERS = {
     ceruledge: {
       id: "ceruledge",
       name: "炭小侍家族",
@@ -1621,10 +1723,61 @@
     }
   };
 
+  /* ================= 年級專屬捕獲魔王存取 (依年級分開儲存) ================= */
+  function getCaughtBossStorageKey(grade) {
+    return `pokemon_caught_bosses_g${grade}`;
+  }
+
+  function getCaughtBosses(grade) {
+    try {
+      const data = localStorage.getItem(getCaughtBossStorageKey(grade));
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCaughtBoss(grade, bossData) {
+    const list = getCaughtBosses(grade);
+    if (!list.some(b => b.name === bossData.boss)) {
+      list.push({
+        id: `boss_${bossData.boss}`,
+        name: bossData.boss,
+        type: bossData.bossType,
+        img: bossData.bossImg
+      });
+      try {
+        localStorage.setItem(getCaughtBossStorageKey(grade), JSON.stringify(list));
+      } catch (e) {}
+    }
+  }
+
+  // 獲取當前年級可選的角色清單 (魔王出戰設定 10 題)
+  function getAllStarters(grade) {
+    const combined = { ...BASE_STARTERS };
+    const caught = getCaughtBosses(grade);
+    caught.forEach(b => {
+      combined[b.id] = {
+        id: b.id,
+        name: b.name,
+        totalQuestions: 10, // 敵方角色改為 10 題速戰
+        isBranch: false,
+        isBoss: true,
+        stage1: {
+          name: b.name,
+          type: b.type,
+          img: b.img,
+          spell: "👑💥",
+          moveName: `神獸專屬奧義・破壞光線！`
+        }
+      };
+    });
+    return combined;
+  }
+
   /* ================= 依年級動態生成道館資料 ================= */
   function getStagesByGrade(grade, regionKey) {
     const sem = regionKey === "kanto" ? "上學期" : "下學期";
-    
     const TOPIC_DESCRIPTIONS = {
       2: {
         kanto: ["基礎關：九九乘法大考驗", "進階關：二位數加法直式大挑戰", "特級關：二位數減法退位大冒險", "冠軍關：二年級乘法與加減終極決戰"],
@@ -1693,6 +1846,7 @@
   let wrongRecords = [];
   let remainingHints = 3;
   let isHintActiveForCurrentQ = false;
+  let currentStreak = 0;
 
   /* ================= 本機排行榜存取 ================= */
   function getLeaderboardKey() {
@@ -1737,7 +1891,7 @@
     });
   }
 
-  /* ================= 頁面切換機制 (100% 絕對安全) ================= */
+  /* ================= 頁面切換機制 ================= */
   function goToGradeSelect() {
     document.getElementById("grade-select-screen").style.display = "flex";
     document.getElementById("world-map-screen").style.display = "none";
@@ -1756,10 +1910,8 @@
     } catch (e) {}
     
     currentGrade = grade;
-    
     const titleElem = document.getElementById("map-header-title");
     if (titleElem) titleElem.innerText = `🗺️ 國小 ${grade} 年級 - 寶可夢數學大冒險 🗺️`;
-    
     goToWorldMap();
   }
 
@@ -1796,24 +1948,62 @@
 
     document.getElementById("gym-menu-title").innerText = `⚔️ ${currentGrade}年級【${semTxt}】挑戰道館 ⚔️`;
 
+    renderStartersList();
     renderGymStages();
     updateLeaderboardUI();
+  }
+
+  function renderStartersList() {
+    const container = document.getElementById("starter-group-container");
+    container.innerHTML = "";
+    const all = getAllStarters(currentGrade);
+
+    // 如果目前選取的角色不在該年級名單中（例如在其他年級切換過來），重設為預設角色
+    if (!all[currentStarterKey]) {
+      currentStarterKey = "ceruledge";
+    }
+
+    Object.values(all).forEach(s => {
+      const card = document.createElement("div");
+      card.className = `starter-card ${s.id === currentStarterKey ? "active" : ""} ${s.isBoss ? "boss-pet" : ""}`;
+      card.onclick = () => selectStarter(s.id);
+
+      let tagClass = "tag-fire";
+      let tagText = "一般";
+      if (s.isBoss) {
+        tagClass = "tag-boss";
+        tagText = "👑2倍速戰";
+      } else if (s.isBranch) {
+        tagClass = "tag-fire";
+        tagText = "二擇分支";
+      } else if (s.stage1.type === "grass") {
+        tagClass = "tag-grass";
+        tagText = "草系";
+      } else if (s.stage1.type === "water") {
+        tagClass = "tag-water";
+        tagText = "水系";
+      } else if (s.stage1.type === "psychic") {
+        tagClass = "tag-psychic";
+        tagText = "超能系";
+      }
+
+      card.innerHTML = `
+        <img src="${s.stage1.img}" alt="${s.name}" />
+        <span>${s.stage1.name} (${s.totalQuestions}題)</span>
+        <span class="starter-type-tag ${tagClass}">${tagText}</span>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function selectStarter(key) {
+    currentStarterKey = key;
+    renderStartersList();
   }
 
   function goToGymMenu() {
     document.getElementById("end-modal").style.display = "none";
     selectRegion(currentRegion);
-  }
-
-  function selectStarter(key) {
-    currentStarterKey = key;
-    document.querySelectorAll(".starter-card").forEach(c => c.classList.remove("active"));
-    const cards = document.querySelectorAll(".starter-card");
-    cards.forEach(card => {
-      if (card.getAttribute("onclick") && card.getAttribute("onclick").includes(key)) {
-        card.classList.add("active");
-      }
-    });
   }
 
   function renderGymStages() {
@@ -1861,126 +2051,47 @@
 
   function createMathProblemRaw(grade, region, qIndex, totalQ) {
     let formula = "", ans = 0, explanation = "", hintGuide = "";
-    
-    // 三階梯難度分界
     const isStage1 = totalQ === 20 ? (qIndex <= 7) : (qIndex <= 10);
     const isStage2 = totalQ === 20 ? (qIndex > 7 && qIndex <= 14) : (qIndex > 10 && qIndex <= 20);
 
-    // =========================================================================
-    // 二年級 (Grade 2)
-    // =========================================================================
     if (grade === 2) {
-      if (region === "kanto") { // 上學期：九九乘法、二位數加減直式、幾十加幾十
+      if (region === "kanto") {
         if (isStage1) {
-          const type = Math.floor(Math.random() * 3);
-          if (type === 0) {
-            const a = Math.floor(Math.random() * 8) + 2;
-            const b = Math.floor(Math.random() * 8) + 2;
-            formula = `${a} × ${b} ＝ ？`;
-            ans = a * b;
-            explanation = `九九乘法：${a} 乘 ${b} 等於 ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>背誦乘法口訣「${a}」的那一行！`;
-          } else if (type === 1) {
-            const a = (Math.floor(Math.random() * 4) + 1) * 10;
-            const b = (Math.floor(Math.random() * 4) + 1) * 10;
-            formula = `${a} ＋ ${b} ＝ ？`;
-            ans = a + b;
-            explanation = `整十加法：${a/10} 個十加上 ${b/10} 個十等於 ${ans/10} 個十 (${ans})`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>把十位數相加，後面補 0！`;
-          } else {
-            const a = Math.floor(Math.random() * 30) + 11;
-            const b = Math.floor(Math.random() * 20) + 11;
-            formula = `${a} ＋ ${b} ＝ ？`;
-            ans = a + b;
-            explanation = `二位數直式加法：個位相加，十位相加得到 ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>個位加個位、十位加十位！`;
-          }
+          const a = Math.floor(Math.random() * 8) + 2;
+          const b = Math.floor(Math.random() * 8) + 2;
+          formula = `${a} × ${b} ＝ ？`;
+          ans = a * b;
+          explanation = `九九乘法：${a} × ${b} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>背誦乘法口訣「${a}」的那一行！`;
         } else if (isStage2) {
-          const type = Math.floor(Math.random() * 3);
-          if (type === 0) {
-            const a = Math.floor(Math.random() * 30) + 25;
-            const b = Math.floor(Math.random() * 25) + 18;
-            formula = `${a} ＋ ${b} ＝ ？`;
-            ans = a + b;
-            explanation = `進位加法：個位滿十進 1 到十位，答案為 ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>個位數相加超過 10，記得進位 1 到十位數！`;
-          } else if (type === 1) {
-            const a = Math.floor(Math.random() * 40) + 40;
-            const b = Math.floor(Math.random() * 20) + 11;
-            formula = `${a} － ${b} ＝ ？`;
-            ans = a - b;
-            explanation = `二位數減法：${a} － ${b} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>個位減個位、十位減十位！`;
-          } else {
-            const a = (Math.floor(Math.random() * 4) + 2) * 5;
-            formula = `5 的 ${a/5} 倍是多少？`;
-            ans = a;
-            explanation = `5 × ${a/5} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>就是計算 5 × ${a/5}！`;
-          }
+          const a = Math.floor(Math.random() * 30) + 25;
+          const b = Math.floor(Math.random() * 25) + 18;
+          formula = `${a} ＋ ${b} ＝ ？`;
+          ans = a + b;
+          explanation = `進位加法：個位滿十進位到十位，答案為 ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>個位數相加超過 10，記得進位 1 到十位數！`;
         } else {
-          const type = Math.floor(Math.random() * 2);
-          if (type === 0) {
-            const a = Math.floor(Math.random() * 30) + 52;
-            const b = Math.floor(Math.random() * 20) + 18;
-            formula = `${a} － ${b} ＝ ？`;
-            ans = a - b;
-            explanation = `退位減法：個位不夠減向十位借 1 當 10，答案為 ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>個位不夠減時，向十位借 1 顆十來減！`;
-          } else {
-            const cost = Math.floor(Math.random() * 20) + 15;
-            formula = `小智拿 50 元買 ${cost} 元的精靈球，應找回多少元？`;
-            ans = 50 - cost;
-            explanation = `找錢計算：50 － ${cost} ＝ ${ans} 元`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>用付的 50 元減去精靈球價錢 ${cost} 元！`;
-          }
+          const a = Math.floor(Math.random() * 30) + 52;
+          const b = Math.floor(Math.random() * 20) + 18;
+          formula = `${a} － ${b} ＝ ？`;
+          ans = a - b;
+          explanation = `退位減法：個位不夠減向十位借 1 當 10，答案為 ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>個位不夠減時，向十位借 1 顆十來減！`;
         }
-      } else { // 下學期：長度公尺公分、三位數加減、分裝除法、鐘面時間
+      } else {
         if (isStage1) {
-          const type = Math.floor(Math.random() * 3);
-          if (type === 0) {
-            const m = Math.floor(Math.random() * 4) + 2;
-            const cm = Math.floor(Math.random() * 70) + 15;
-            formula = `${m} 公尺 ${cm} 公分 ＝ 多少公分？`;
-            ans = m * 100 + cm;
-            explanation = `1 公尺 ＝ 100 公分，${m} 公尺 ＝ ${m*100} 公分，再加上 ${cm} 公分 ＝ ${ans} 公分`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${m} 公尺 ＝ ${m*100} 公分，再加上後面的 ${cm} 公分！`;
-          } else if (type === 1) {
-            const cms = (Math.floor(Math.random() * 4) + 2) * 100;
-            formula = `${cms} 公分 ＝ 多少公尺？`;
-            ans = cms / 100;
-            explanation = `100 公分 ＝ 1 公尺，${cms} 公分 ＝ ${ans} 公尺`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>每 100 公分等於 1 公尺，算算看有幾個 100！`;
-          } else {
-            const a = Math.floor(Math.random() * 200) + 100;
-            const b = Math.floor(Math.random() * 200) + 100;
-            formula = `${a} ＋ ${b} ＝ ？`;
-            ans = a + b;
-            explanation = `三位數加法：${a} ＋ ${b} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>個位、十位、百位對齊相加！`;
-          }
+          const m = Math.floor(Math.random() * 4) + 2;
+          const cm = Math.floor(Math.random() * 70) + 15;
+          formula = `${m} 公尺 ${cm} 公分 ＝ 多少公分？`;
+          ans = m * 100 + cm;
+          explanation = `1 公尺 ＝ 100 公分，${m} 公尺 ＝ ${m*100} 公分，再加上 ${cm} 公分 ＝ ${ans} 公分`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${m} 公尺 ＝ ${m*100} 公分，再加上後面的 ${cm} 公分！`;
         } else if (isStage2) {
-          const type = Math.floor(Math.random() * 3);
-          if (type === 0) {
-            const count = (Math.floor(Math.random() * 5) + 3) * 4;
-            formula = `${count} 顆樹果，每 4 顆裝一盒，可以裝幾盒？`;
-            ans = count / 4;
-            explanation = `平均分裝：${count} ÷ 4 ＝ ${ans} 盒`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>想一想 4 乘以多少會剛好是 ${count}？`;
-          } else if (type === 1) {
-            const h = Math.floor(Math.random() * 3) + 2;
-            formula = `上午 8 點再過 ${h} 小時是上午幾點？`;
-            ans = 8 + h;
-            explanation = `時間計算：8 ＋ ${h} ＝ ${ans} 點`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>從 8 點往後數 ${h} 個小時！`;
-          } else {
-            const a = Math.floor(Math.random() * 300) + 400;
-            const b = Math.floor(Math.random() * 200) + 100;
-            formula = `${a} － ${b} ＝ ？`;
-            ans = a - b;
-            explanation = `三位數減法：${a} － ${b} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>三位數直式相減！`;
-          }
+          const count = (Math.floor(Math.random() * 5) + 3) * 4;
+          formula = `${count} 顆樹果，每 4 顆裝一盒，可以裝幾盒？`;
+          ans = count / 4;
+          explanation = `平均分裝：${count} ÷ 4 ＝ ${ans} 盒`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>想一想 4 乘以多少會剛好是 ${count}？`;
         } else {
           const total = (Math.floor(Math.random() * 4) + 3) * 5;
           formula = `${total} 顆神奇糖果，平分給 5 隻寶可夢，每隻分幾顆？`;
@@ -1989,56 +2100,23 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>想一想 5 乘以幾等於 ${total}！`;
         }
       }
-    }
-
-    // =========================================================================
-    // 三年級 (Grade 3)
-    // =========================================================================
-    else if (grade === 3) {
+    } else if (grade === 3) {
       if (region === "kanto") {
         if (isStage1) {
-          const type = Math.floor(Math.random() * 2);
-          if (type === 0) {
-            const den = [5, 6, 7, 8, 9][Math.floor(Math.random() * 5)];
-            const a = Math.floor(Math.random() * (den - 2)) + 1;
-            const b = Math.floor(Math.random() * (den - a - 1)) + 1;
-            formula = `${a}/${den} ＋ ${b}/${den} ＝ x/${den}，求分子 x`;
-            ans = a + b;
-            explanation = `同分母分數相加，分子相加：${a} ＋ ${b} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>分母 ${den} 不變，把分子相加！`;
-          } else {
-            const d1 = Math.floor(Math.random() * 5) + 1;
-            const d2 = Math.floor(Math.random() * 4) + 1;
-            formula = `0.${d1} ＋ 0.${d2} ＝ ？`;
-            ans = parseFloat(((d1 + d2) / 10).toFixed(1));
-            explanation = `小數加法：${d1}個0.1加上${d2}個0.1等於 ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊算 ${d1} ＋ ${d2}！`;
-          }
+          const den = [5, 6, 7, 8, 9][Math.floor(Math.random() * 5)];
+          const a = Math.floor(Math.random() * (den - 2)) + 1;
+          const b = Math.floor(Math.random() * (den - a - 1)) + 1;
+          formula = `${a}/${den} ＋ ${b}/${den} ＝ x/${den}，求分子 x`;
+          ans = a + b;
+          explanation = `同分母分數相加，分子相加：${a} ＋ ${b} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>分母 ${den} 不變，把分子相加！`;
         } else if (isStage2) {
-          const type = Math.floor(Math.random() * 3);
-          if (type === 0) {
-            const a = Math.floor(Math.random() * 150) + 120;
-            const b = Math.floor(Math.random() * 3) + 2;
-            formula = `${a} × ${b} ＝ ？`;
-            ans = a * b;
-            explanation = `三位數乘一位數：${a} × ${b} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>由個位往百位依序乘上 ${b}！`;
-          } else if (type === 1) {
-            const d1 = Math.floor(Math.random() * 5) + 5;
-            const d2 = Math.floor(Math.random() * 4) + 1;
-            formula = `1.${d1} － 0.${d2} ＝ ？`;
-            ans = parseFloat((1 + (d1 - d2) / 10).toFixed(1));
-            explanation = `小數減法：1.${d1} － 0.${d2} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊相減！`;
-          } else {
-            const den = 8;
-            const a = Math.floor(Math.random() * 3) + 4;
-            const b = Math.floor(Math.random() * 3) + 1;
-            formula = `${a}/${den} － ${b}/${den} ＝ x/${den}，求分子 x`;
-            ans = a - b;
-            explanation = `同分母相減：分子 ${a} － ${b} ＝ ${ans}`;
-            hintGuide = `💡 <b>皮卡丘引導：</b>算分子 ${a} － ${b}！`;
-          }
+          const a = Math.floor(Math.random() * 150) + 120;
+          const b = Math.floor(Math.random() * 3) + 2;
+          formula = `${a} × ${b} ＝ ？`;
+          ans = a * b;
+          explanation = `三位數乘一位數：${a} × ${b} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>由個位往百位依序乘上 ${b}！`;
         } else {
           const divisor = Math.floor(Math.random() * 4) + 2;
           const quotient = Math.floor(Math.random() * 40) + 20;
@@ -2071,12 +2149,7 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>1 公斤 ＝ 1000 公克！`;
         }
       }
-    }
-
-    // =========================================================================
-    // 四年級 (Grade 4)
-    // =========================================================================
-    else if (grade === 4) {
+    } else if (grade === 4) {
       if (region === "kanto") {
         if (isStage1) {
           const a = (Math.floor(Math.random() * 30) + 10) / 100;
@@ -2117,12 +2190,7 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>三角形內角總和是 180 度！`;
         }
       }
-    }
-
-    // =========================================================================
-    // 五年級 (Grade 5)
-    // =========================================================================
-    else if (grade === 5) {
+    } else if (grade === 5) {
       if (region === "kanto") {
         if (isStage1) {
           const a = (Math.floor(Math.random() * 3) + 2) * 2;
@@ -2162,12 +2230,7 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>打八折代表乘以 0.8！`;
         }
       }
-    }
-
-    // =========================================================================
-    // 六年級 (Grade 6)
-    // =========================================================================
-    else {
+    } else {
       if (region === "kanto") {
         if (isStage1) {
           const a = (Math.floor(Math.random() * 3) + 2) * 2;
@@ -2206,7 +2269,6 @@
       }
     }
 
-    // 生成干擾選項
     const options = new Set([ans]);
     let optAttempts = 0;
     while (options.size < 4 && optAttempts < 50) {
@@ -2231,6 +2293,78 @@
       hintGuide,
       options: Array.from(options).sort(() => Math.random() - 0.5)
     };
+  }
+
+  /* ================= 抓寶系統邏輯 (90% 判定 & 失敗動畫) ================= */
+  function triggerCatchPhase(isCatchSuccess) {
+    if (isCatchSuccess) playCatchSE();
+    else playCatchFailSE();
+
+    const overlay = document.getElementById("catch-overlay");
+    const title = document.getElementById("catch-title");
+    const ballBox = document.getElementById("catch-ball-box");
+    const txt = document.getElementById("catch-result-txt");
+    const doneBtn = document.getElementById("catch-done-btn");
+
+    overlay.style.display = "flex";
+    title.innerText = `✨ 進入捕獲【${currentStageObj.boss}】階段！ ✨`;
+    txt.innerText = "投擲精靈球中...";
+    doneBtn.style.display = "none";
+    doneBtn.className = "catch-btn";
+
+    if (isCatchSuccess) {
+      ballBox.className = "pokeball-anim ball-wobble-success";
+      setTimeout(() => {
+        ballBox.className = "pokeball-anim";
+        title.innerText = `🎉 恭喜在【${currentGrade}年級】成功捕獲【${currentStageObj.boss}】！ 🎉`;
+        txt.innerHTML = `已解鎖至【${currentGrade}年級】出戰清單！<br><span style="color:#f59e0b; font-size:17px;">👑 專屬特權：10題速戰 ＋ 攻擊力2倍！</span>`;
+        doneBtn.innerText = "收服成功！加入夥伴！";
+        doneBtn.style.display = "block";
+
+        saveCaughtBoss(currentGrade, currentStageObj);
+      }, 1900);
+    } else {
+      ballBox.className = "pokeball-anim ball-wobble-fail";
+      setTimeout(() => {
+        ballBox.className = "pokeball-anim";
+        title.innerText = `💥 捕獲失敗！【${currentStageObj.boss}】掙脫逃跑了！`;
+        txt.innerHTML = `<span style="color:#f87171;">正確率需達 90% 以上才能收服魔王喔！再接再厲！</span>`;
+        doneBtn.innerText = "查看戰鬥結算";
+        doneBtn.className = "catch-btn fail";
+        doneBtn.style.display = "block";
+      }, 1300);
+    }
+  }
+
+  function finishCatchModal() {
+    document.getElementById("catch-overlay").style.display = "none";
+    document.getElementById("end-modal").style.display = "flex";
+    renderStartersList(); // 即時重新渲染選角清單，魔王立即解鎖可用
+  }
+
+  /* ================= 爆擊動態金幣特效 ================= */
+  function spawnCoinBurst() {
+    const stage = document.getElementById("battle-stage-area");
+    const oppImg = document.getElementById("opp-sprite");
+    const rect = oppImg.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+
+    const originX = rect.left - stageRect.left + rect.width / 2;
+    const originY = rect.top - stageRect.top + rect.height / 2;
+
+    const coins = ["⭐", "✨", "🪙", "🌟"];
+    for (let i = 0; i < 16; i++) {
+      const p = document.createElement("div");
+      p.className = "coin-particle";
+      p.innerText = coins[Math.floor(Math.random() * coins.length)];
+      p.style.left = `${originX}px`;
+      p.style.top = `${originY}px`;
+      const tx = (Math.random() - 0.5) * 220;
+      p.style.setProperty("--tx", `${tx}px`);
+      stage.appendChild(p);
+
+      setTimeout(() => p.remove(), 800);
+    }
   }
 
   /* ================= 皮卡丘救援控制 ================= */
@@ -2260,6 +2394,7 @@
     correctCount = 0;
     wrongRecords = [];
     startTime = Date.now();
+    currentStreak = 0;
 
     usedProblemSignatures.clear();
 
@@ -2268,9 +2403,11 @@
     document.getElementById("help-count").innerText = remainingHints;
     document.getElementById("pika-help-btn").disabled = false;
     document.getElementById("helper-pikachu").style.display = "none";
+    document.getElementById("combo-badge").style.display = "none";
 
-    const starter = STARTERS_DATA[currentStarterKey];
-    totalStageQuestions = starter.totalQuestions;
+    const all = getAllStarters(currentGrade);
+    const starter = all[currentStarterKey] || all.ceruledge;
+    totalStageQuestions = starter.totalQuestions; // 使用神獸魔王時為 10 題
 
     document.getElementById("branch-overlay").style.display = "none";
     document.getElementById("menu-screen").style.display = "none";
@@ -2312,8 +2449,7 @@
 
   function nextQuestion() {
     if (currentQuestionCount >= totalStageQuestions || oppHp <= 0 || playerHp <= 0) {
-      const winThreshold = Math.ceil(totalStageQuestions * 0.7);
-      endBattle(oppHp <= 0 || correctCount >= winThreshold);
+      endBattle(oppHp <= 0 || correctCount >= Math.ceil(totalStageQuestions * 0.7));
       return;
     }
 
@@ -2325,7 +2461,7 @@
 
     let tierName = totalStageQuestions === 20 
       ? (currentQuestionCount <= 7 ? "基礎關" : currentQuestionCount <= 14 ? "進階關" : "高階試煉")
-      : (currentQuestionCount <= 10 ? "基礎關" : currentQuestionCount <= 20 ? "進階關" : "高階試煉");
+      : (totalStageQuestions === 10 ? "速戰階段" : (currentQuestionCount <= 10 ? "基礎關" : currentQuestionCount <= 20 ? "進階關" : "高階試煉"));
 
     document.getElementById("dialog-hint").innerText = `第 ${currentQuestionCount} / ${totalStageQuestions} 題 [${tierName}]：請計算發動攻擊！`;
     document.getElementById("dialog-formula").innerText = `${currentProblemObj.formula}`;
@@ -2344,17 +2480,20 @@
 
     const btns = document.querySelectorAll(".choice-btn");
     const chosenVal = parseFloat(btns[choiceIdx].innerText);
-    const starter = STARTERS_DATA[currentStarterKey];
+    const all = getAllStarters(currentGrade);
+    const starter = all[currentStarterKey] || all.ceruledge;
 
     const playerImg = document.getElementById("player-sprite");
     const pikaImg = document.getElementById("helper-pikachu");
     const oppImg = document.getElementById("opp-sprite");
     const banner = document.getElementById("feedback-banner");
+    const comboBadge = document.getElementById("combo-badge");
+    const oppHud = document.getElementById("opp-hud");
 
     let currentStageData = starter.stage1;
     if (starter.isBranch && selectedBranchObj) {
       currentStageData = selectedBranchObj;
-    } else if (!starter.isBranch) {
+    } else if (!starter.isBranch && !starter.isBoss) {
       if (currentEvolutionStage === 2) currentStageData = starter.stage2;
       if (currentEvolutionStage === 3) currentStageData = starter.stage3;
     }
@@ -2368,37 +2507,54 @@
 
     if (Math.abs(chosenVal - currentAns) < 0.01) {
       correctCount++;
-      playCorrectSE();
+      currentStreak++;
 
-      let moveText = `${currentStageData.name} 發動了【${currentStageData.moveName}】`;
-      
+      let isCrit = false;
+      if (currentStreak >= 5) {
+        isCrit = true;
+        playCriticalSE();
+        banner.innerText = `⚡ CRITICAL HIT！5連擊！`;
+        banner.className = "feedback-banner show critical";
+        comboBadge.innerText = `💥 ${currentStreak} COMBO MAX！`;
+        comboBadge.style.display = "block";
+      } else if (currentStreak >= 3) {
+        playCorrectSE();
+        banner.innerText = `🔥 3 COMBO！火花四射！`;
+        banner.className = "feedback-banner show correct";
+        comboBadge.innerText = `🔥 ${currentStreak} COMBO！`;
+        comboBadge.style.display = "block";
+      } else {
+        playCorrectSE();
+        let moveText = `${currentStageData.name}【${currentStageData.moveName}】`;
+        if (multiplier > 1.0) moveText = `🔥 效果絕佳！${currentStageData.name}【${currentStageData.moveName}】`;
+        banner.innerText = moveText;
+        banner.className = "feedback-banner show correct";
+      }
+
       if (isHintActiveForCurrentQ) {
         remainingHints--;
         document.getElementById("help-count").innerText = remainingHints;
         if (remainingHints <= 0) document.getElementById("pika-help-btn").disabled = true;
 
         playPikaThunderSE();
-        moveText = `⚡ 皮卡丘支援！合體【十萬伏特 ＋ ${currentStageData.moveName}】`;
         pikaImg.classList.add("helper-rush-attack");
       }
 
-      if (multiplier > 1.0 && !isHintActiveForCurrentQ) moveText = `🔥 效果絕佳！${currentStageData.name}【${currentStageData.moveName}】`;
-      else if (multiplier < 1.0 && !isHintActiveForCurrentQ) moveText = `🛡️ 命中！${currentStageData.name}【${currentStageData.moveName}】`;
-
-      banner.innerText = moveText;
-      banner.className = "feedback-banner show correct";
-
       playerImg.classList.add("player-rush-attack");
       const spell = document.getElementById("spell-opp");
-      spell.innerText = isHintActiveForCurrentQ ? "⚡💥" : currentStageData.spell;
+      spell.innerText = isCrit ? "⚡💥🌟" : currentStageData.spell;
       spell.classList.add("active");
 
-      let baseDamage = Math.ceil((100 / totalStageQuestions) * 1.25);
-      if (isHintActiveForCurrentQ) baseDamage = Math.ceil(baseDamage * 1.4);
+      // 傷害計算：一般角色不因連擊爆擊倍增傷害，只有選用神獸魔王出戰時享有 2 倍攻擊力
+      let baseDamage = Math.ceil((100 / totalStageQuestions) * 1.05);
+      if (starter.isBoss) baseDamage *= 2; 
+      if (isHintActiveForCurrentQ) baseDamage = Math.ceil(baseDamage * 1.15);
       const totalDamage = Math.ceil(baseDamage * multiplier);
 
       setTimeout(() => {
         oppImg.classList.add("shake", "blink");
+        oppHud.classList.add("shake");
+        if (isCrit || currentStreak >= 3) spawnCoinBurst();
         oppHp -= totalDamage;
         updateHpUI();
       }, 250);
@@ -2409,6 +2565,7 @@
           pikaImg.classList.remove("helper-rush-attack");
           pikaImg.style.display = "none";
           oppImg.classList.remove("shake", "blink");
+          oppHud.classList.remove("shake");
           spell.classList.remove("active");
           banner.className = "feedback-banner";
           document.getElementById("branch-overlay").style.display = "flex";
@@ -2418,7 +2575,7 @@
 
       let shouldEvolve = false;
       let targetStage = 2;
-      if (!starter.isBranch) {
+      if (!starter.isBranch && !starter.isBoss) {
         if (currentQuestionCount === 10 && currentEvolutionStage === 1) {
           shouldEvolve = true;
           targetStage = 2;
@@ -2441,12 +2598,16 @@
         pikaImg.classList.remove("helper-rush-attack");
         pikaImg.style.display = "none";
         oppImg.classList.remove("shake", "blink");
+        oppHud.classList.remove("shake");
         spell.classList.remove("active");
         banner.className = "feedback-banner";
         nextQuestion();
       }, 1300);
 
     } else {
+      currentStreak = 0;
+      comboBadge.style.display = "none";
+
       if (isHintActiveForCurrentQ) {
         remainingHints--;
         document.getElementById("help-count").innerText = remainingHints;
@@ -2490,7 +2651,7 @@
   /* ================= 分支選擇與動畫 ================= */
   function chooseArmarouge() {
     document.getElementById("branch-overlay").style.display = "none";
-    const starter = STARTERS_DATA.ceruledge;
+    const starter = BASE_STARTERS.ceruledge;
     selectedBranchObj = starter.branchArmarouge;
     currentEvolutionStage = 2;
     performEvolutionAnim(starter.stage1, selectedBranchObj);
@@ -2498,7 +2659,7 @@
 
   function chooseCeruledge() {
     document.getElementById("branch-overlay").style.display = "none";
-    const starter = STARTERS_DATA.ceruledge;
+    const starter = BASE_STARTERS.ceruledge;
     selectedBranchObj = starter.branchCeruledge;
     currentEvolutionStage = 2;
     performEvolutionAnim(starter.stage1, selectedBranchObj);
@@ -2506,7 +2667,8 @@
 
   function triggerEvolution(targetStage) {
     currentEvolutionStage = targetStage;
-    const starter = STARTERS_DATA[currentStarterKey];
+    const all = getAllStarters(currentGrade);
+    const starter = all[currentStarterKey] || all.ceruledge;
     let fromObj = starter.stage1;
     let toObj = starter.stage2;
 
@@ -2546,7 +2708,7 @@
     }, 3600);
   }
 
-  /* ================= 結算彈窗與成績登錄 ================= */
+  /* ================= 結算彈窗與成績登錄 (90% 捕獲判定) ================= */
   function endBattle(isWin) {
     const timeUsed = Math.max(1, Math.floor((Date.now() - startTime) / 1000));
     const accuracy = Math.round((correctCount / totalStageQuestions) * 100);
@@ -2588,7 +2750,13 @@
       });
     }
 
-    modal.style.display = "flex";
+    // 勝利或通關時，進入捕獲判定（90% 成功，低於 90% 失敗）
+    if (isWin) {
+      const isSuccess = accuracy >= 90;
+      setTimeout(() => triggerCatchPhase(isSuccess), 400);
+    } else {
+      modal.style.display = "flex";
+    }
   }
 
   function saveRecord() {
