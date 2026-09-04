@@ -97,7 +97,7 @@
     .map-btn { background: #0284c7; }
     .bgm-btn { background: #10b981; }
 
-    /* ================= 0. 年級選擇主頁 ================= */
+    /* 0. 年級選擇主頁 */
     .grade-select-screen {
       flex: 1;
       display: flex;
@@ -183,7 +183,7 @@
       line-height: 1.35;
     }
 
-    /* ================= 1. 大地圖 ================= */
+    /* 1. 大地圖 */
     .world-map-screen {
       display: none;
       flex: 1;
@@ -261,9 +261,7 @@
       backdrop-filter: blur(8px);
     }
 
-    .region-map-card:active {
-      transform: scale(0.97);
-    }
+    .region-map-card:active { transform: scale(0.97); }
 
     .region-badge {
       font-size: clamp(10px, 1.4vh, 12px);
@@ -314,7 +312,7 @@
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
     }
 
-    /* ================= 2. 道館與選角大廳 ================= */
+    /* 2. 道館與選角大廳 */
     .menu-screen {
       display: none;
       flex: 1;
@@ -502,7 +500,7 @@
     .rank-table th { background: #0f172a; color: #fbbf24; padding: 3px; text-align: center; }
     .rank-table td { padding: 3px 2px; border-bottom: 1px solid #334155; text-align: center; }
 
-    /* ================= 3. 戰鬥畫面 ================= */
+    /* 3. 戰鬥畫面 */
     .battle-screen {
       display: none;
       flex-direction: column;
@@ -856,7 +854,7 @@
       box-shadow: 0 4px 0 #b91c1c;
     }
 
-    /* ================= 4. 皮卡丘救援提示 Overlay ================= */
+    /* 4. 皮卡丘救援提示 Overlay */
     .hint-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -891,17 +889,8 @@
       padding-bottom: 6px;
     }
 
-    .hint-header img {
-      width: 42px;
-      height: 42px;
-      object-fit: contain;
-    }
-
-    .hint-header h3 {
-      font-size: 15px;
-      color: #fbbf24;
-      font-weight: 900;
-    }
+    .hint-header img { width: 42px; height: 42px; object-fit: contain; }
+    .hint-header h3 { font-size: 15px; color: #fbbf24; font-weight: 900; }
 
     .hint-body {
       font-size: clamp(11.5px, 1.7vh, 13.5px);
@@ -1011,11 +1000,7 @@
       align-items: center;
     }
 
-    .evo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+    .evo-img { width: 100%; height: 100%; object-fit: contain; }
 
     .control-panel {
       flex: 1;
@@ -1331,17 +1316,6 @@
         <rect x="0" y="0" width="110" height="30" rx="15" fill="rgba(15, 23, 42, 0.85)" stroke="#fbbf24" stroke-width="1.5" />
         <text x="55" y="20" font-size="13" font-weight="bold" fill="#f8fafc" text-anchor="middle">⛰️ 白銀山</text>
       </g>
-
-      <g transform="translate(90, 95)">
-        <circle cx="0" cy="0" r="38" fill="rgba(13, 27, 42, 0.75)" stroke="#fbbf24" stroke-width="2" />
-        <polygon points="0,-30 8,-6 0,0" fill="#ef4444" />
-        <polygon points="0,-30 -8,-6 0,0" fill="#b91c1c" />
-        <polygon points="0,30 8,6 0,0" fill="#f1f5f9" />
-        <polygon points="0,30 -8,6 0,0" fill="#94a3b8" />
-        <polygon points="30,0 6,8 0,0" fill="#f1f5f9" />
-        <polygon points="-30,0 -6,-8 0,0" fill="#f1f5f9" />
-        <text x="-5" y="-35" font-size="13" font-weight="900" fill="#fff">N</text>
-      </g>
     </svg>
 
     <div class="map-header">
@@ -1436,14 +1410,10 @@
         <canvas id="scratchpad-canvas" class="scratchpad-canvas"></canvas>
       </div>
 
-      <!-- 敵方魔王立繪 -->
       <img id="opp-sprite" class="sprite opponent" src="" alt="Opponent" />
-      
-      <!-- 玩家立繪與皮卡丘支援立繪 -->
       <img id="player-sprite" class="sprite player" src="" alt="Player" />
       <img id="helper-pikachu" class="sprite helper-pikachu" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" alt="皮卡丘" />
 
-      <!-- 加大明顯的皮卡丘求助按鈕 -->
       <button id="pika-help-btn" class="battle-pika-help-btn" onclick="triggerPikachuHelp()">
         <img class="battle-pika-icon" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" alt="皮卡丘" />
         <div class="battle-pika-text">
@@ -1510,9 +1480,7 @@
 
 <script>
   /* ================= 音訊引擎安全封裝 ================= */
-  let audioCtx = null;
-  let masterGain = null;
-  let bgmEnabled = true, bgmInterval = null, bgmStep = 0;
+  let audioCtx = null, masterGain = null, bgmEnabled = true, bgmInterval = null, bgmStep = 0;
 
   function initAudioBus() {
     if (audioCtx) return;
@@ -1762,29 +1730,29 @@
     return combined;
   }
 
-  /* ================= 依年級動態生成道館資料 ================= */
+  /* ================= 依年級動態生成道館資料（校正所有錯字與單元名稱） ================= */
   function getStagesByGrade(grade, regionKey) {
     const sem = regionKey === "kanto" ? "上學期" : "下學期";
     const TOPIC_DESCRIPTIONS = {
       2: {
-        kanto: ["基礎關：九九乘法大考驗", "進階關：二位數加法直式大挑戰", "特級關：二位數減法退位大冒險", "冠軍關：二年級乘法與加減終極決戰"],
-        kalos: ["基礎關：公尺與公分長度大變身", "進階關：分裝糖果除法初體驗", "特級關：時鐘與時間計算大考驗", "冠軍關：二年級生活數學冠軍試煉"]
+        kanto: ["九九乘法口訣大考驗", "二位數不進位與進位加法", "二位數退位減法大冒險", "二年級乘法與加減終極決戰"],
+        kalos: ["公尺與公分長度大變身", "分裝與平分除法初體驗", "鐘面時間與經過時間計算", "二年級生活長度與計量冠軍試煉"]
       },
       3: {
-        kanto: ["基礎關：同分母分數加減法", "進階關：一位小數加減大對決", "特級關：三位數四則運算大挑戰", "冠軍關：三年級分數小數榮耀試煉"],
-        kalos: ["基礎關：長方形面積公式大解密", "進階關：正方形周長與面積運算", "特級關：重量公斤與公克大換算", "冠軍關：三年級幾何與計量終極決戰"]
+        kanto: ["三位數直式乘法與加減", "除法初步與三位數除以一位數", "整數四則混合與千以內運算", "分數與小數的榮耀試煉"],
+        kalos: ["長方形面積公式大解密", "正方形周長與面積運算", "重量公斤與公克單位換算", "三年級幾何與計量終極決戰"]
       },
       4: {
-        kanto: ["基礎關：二位小數加法與減法", "進階關：假分數與帶分數大變身", "特級關：億以內大數字運算挑戰", "冠軍關：四年級分數小數大決戰"],
-        kalos: ["基礎關：括號先算四則混合魔法", "進階關：多邊形角度與等腰三角形", "特級關：公尺公里與小數乘整數", "冠軍關：四年級幾何與運算冠軍殿堂"]
+        kanto: ["二位小數直式加法與減法", "假分數與帶分數互換變身", "億以內大數字計算挑戰", "四年級分數與小數大決戰"],
+        kalos: ["括號先算四則混合魔法", "多邊形角度與等腰三角形", "公里公尺與小數乘整數", "四年級幾何與運算冠軍殿堂"]
       },
       5: {
-        kanto: ["基礎關：因數倍數與公因數判定", "進階關：異分母分數通分加減法", "特級關：整數四則混合運算挑戰", "冠軍關：平行四邊形與梯形面積大決戰"],
-        kalos: ["基礎關：分數乘以整數魔法運算", "進階關：正方體與長方體體積公式", "特級關：公升與毫升容量容積換算", "冠軍關：百分率折數與五年級總決賽"]
+        kanto: ["因數倍數與公因數判定", "異分母分數通分加減法", "整數四則混合運算挑戰", "平行四邊形與梯形面積大決戰"],
+        kalos: ["分數乘以整數魔法運算", "正方體與長方體體積公式", "公升與毫升容量容積換算", "百分率折數與五年級總決賽"]
       },
       6: {
-        kanto: ["基礎關：最簡整數比與比例式求解", "進階關：圓周長與圓面積計算", "特級關：分數除法與小數除法運算", "冠軍關：扇形弧長面積與六年級總決賽"],
-        kalos: ["基礎關：未知數方程式移項大解密", "進階關：速率相遇與追趕大冒險", "特級關：角柱與圓柱體積表面積", "冠軍關：雞兔同籠與小學數學終極冠軍殿堂"]
+        kanto: ["最簡整數比與比例式求解", "圓周長與圓面積計算", "分數除法與小數除法運算", "扇形弧長面積與六年級總決賽"],
+        kalos: ["未知數方程式移項大解密", "速率相遇與追趕大冒險", "角柱與圓柱體積表面積", "雞兔同籠與小學數學終極冠軍殿堂"]
       }
     };
 
@@ -1794,20 +1762,20 @@
       return {
         name: `🏯 卡洛斯地區 (${grade}年級${sem})`,
         stages: [
-          { id: "kalos_1", name: "生命之樹", boss: "哲爾尼亞斯", bossType: "fairy", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/716.png", desc: descs[0], level: 35, diff: "easy", diffName: "初級" },
-          { id: "kalos_2", name: "破滅之翼", boss: "伊裴爾塔爾", bossType: "dark", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/717.png", desc: descs[1], level: 60, diff: "mid", diffName: "高級" },
-          { id: "kalos_3", name: "蒸汽火山口", boss: "波爾凱尼恩", bossType: "water", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/721.png", desc: descs[2], level: 80, diff: "hard", diffName: "特級" },
-          { id: "kalos_4", name: "極地冰峰", boss: "冰岩怪", bossType: "ice", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/713.png", desc: descs[3], level: 95, diff: "champ", diffName: "冠軍" }
+          { id: "kalos_1", name: "生命之樹", boss: "哲爾尼亞斯", bossType: "fairy", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/716.png", desc: `[初級] ${descs[0]}`, level: 35, diff: "easy", diffName: "初級" },
+          { id: "kalos_2", name: "破滅之翼", boss: "伊裴爾塔爾", bossType: "dark", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/717.png", desc: `[高級] ${descs[1]}`, level: 60, diff: "mid", diffName: "高級" },
+          { id: "kalos_3", name: "蒸汽火山口", boss: "波爾凱尼恩", bossType: "water", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/721.png", desc: `[特級] ${descs[2]}`, level: 80, diff: "hard", diffName: "特級" },
+          { id: "kalos_4", name: "極地冰峰", boss: "冰岩怪", bossType: "ice", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/713.png", desc: `[冠軍] ${descs[3]}`, level: 95, diff: "champ", diffName: "冠軍" }
         ]
       };
     } else {
       return {
         name: `⚡ 關東地區 (${grade}年級${sem})`,
         stages: [
-          { id: "kanto_1", name: "龍之神殿", boss: "快龍", bossType: "dragon", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png", desc: descs[0], level: 35, diff: "easy", diffName: "初級" },
-          { id: "kanto_2", name: "寧靜之森", boss: "卡比獸", bossType: "normal", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png", desc: descs[1], level: 60, diff: "mid", diffName: "高級" },
-          { id: "kanto_3", name: "精神領域", boss: "超夢", bossType: "psychic", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png", desc: descs[2], level: 80, diff: "hard", diffName: "特級" },
-          { id: "kanto_4", name: "烈焰火山", boss: "火焰鳥", bossType: "flying", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/146.png", desc: descs[3], level: 95, diff: "champ", diffName: "冠軍" }
+          { id: "kanto_1", name: "龍之神殿", boss: "快龍", bossType: "dragon", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png", desc: `[初級] ${descs[0]}`, level: 35, diff: "easy", diffName: "初級" },
+          { id: "kanto_2", name: "寧靜之森", boss: "卡比獸", bossType: "normal", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png", desc: `[高級] ${descs[1]}`, level: 60, diff: "mid", diffName: "高級" },
+          { id: "kanto_3", name: "精神領域", boss: "超夢", bossType: "psychic", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png", desc: `[特級] ${descs[2]}`, level: 80, diff: "hard", diffName: "特級" },
+          { id: "kanto_4", name: "烈焰火山", boss: "火焰鳥", bossType: "flying", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/146.png", desc: `[冠軍] ${descs[3]}`, level: 95, diff: "champ", diffName: "冠軍" }
         ]
       };
     }
@@ -1891,11 +1859,7 @@
   }
 
   function selectGrade(grade) {
-    try {
-      ensureAudio();
-      startBGM();
-    } catch (e) {}
-    
+    try { ensureAudio(); startBGM(); } catch (e) {}
     currentGrade = grade;
     const titleElem = document.getElementById("map-header-title");
     if (titleElem) titleElem.innerText = `🗺️ 國小 ${grade} 年級 - 寶可夢數學大冒險 🗺️`;
@@ -1914,10 +1878,7 @@
   }
 
   function selectRegion(regionKey) {
-    try {
-      ensureAudio();
-      startBGM();
-    } catch (e) {}
+    try { ensureAudio(); startBGM(); } catch (e) {}
 
     currentRegion = regionKey;
     const regionData = getStagesByGrade(currentGrade, regionKey);
@@ -2013,16 +1974,16 @@
     });
   }
 
-  /* ================= 2~6 年級超豐富多元題型引擎（徹底解決題庫匱乏重複） ================= */
+  /* ================= 核心題庫引擎：嚴格依據關卡 ID 出題，100% 吻合單元 ================= */
   let usedProblemSignatures = new Set();
 
-  function generateMathProblemNoDup(grade, region, qIndex, totalQ) {
+  function generateMathProblemNoDup(grade, region, stageId, qIndex, totalQ) {
     let problem = null;
     let attempts = 0;
 
     while (attempts < 100) {
       attempts++;
-      problem = createMathProblemRaw(grade, region, qIndex, totalQ);
+      problem = createMathProblemRaw(grade, region, stageId, qIndex, totalQ);
       const signature = `${problem.formula}_${problem.ans}`;
       if (!usedProblemSignatures.has(signature)) {
         usedProblemSignatures.add(signature);
@@ -2035,303 +1996,280 @@
   function getGCD(a, b) { return b === 0 ? a : getGCD(b, a % b); }
   function getLCM(a, b) { return (a * b) / getGCD(a, b); }
 
-  function createMathProblemRaw(grade, region, qIndex, totalQ) {
+  function createMathProblemRaw(grade, region, stageId, qIndex, totalQ) {
     let formula = "", ans = 0, explanation = "", hintGuide = "";
     const isStage1 = totalQ === 20 ? (qIndex <= 7) : (qIndex <= 10);
     const isStage2 = totalQ === 20 ? (qIndex > 7 && qIndex <= 14) : (qIndex > 10 && qIndex <= 20);
 
-    // =========================================================================
-    // 二年級 (Grade 2)
-    // =========================================================================
+    // =========================== 2年級 ===========================
     if (grade === 2) {
       if (region === "kanto") {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
+        if (stageId === "kanto_1") { // 九九乘法口訣
           const a = Math.floor(Math.random() * 8) + 2;
           const b = Math.floor(Math.random() * 8) + 2;
           formula = `${a} × ${b} ＝ ？`;
           ans = a * b;
           explanation = `九九乘法：${a} × ${b} ＝ ${ans}`;
           hintGuide = `💡 <b>皮卡丘引導：</b>背誦「${a}」的乘法口訣！`;
-        } else if (type === 1) {
-          const a = (Math.floor(Math.random() * 4) + 1) * 10;
-          const b = (Math.floor(Math.random() * 4) + 1) * 10;
+        } else if (stageId === "kanto_2") { // 二位數不進位與進位加法
+          const a = Math.floor(Math.random() * 40) + 15;
+          const b = Math.floor(Math.random() * 35) + 15;
           formula = `${a} ＋ ${b} ＝ ？`;
           ans = a + b;
-          explanation = `整十加法：${a/10} 個十加上 ${b/10} 個十等於 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>十位相加，個位補 0！`;
-        } else if (type === 2) {
-          const a = Math.floor(Math.random() * 30) + 25;
-          const b = Math.floor(Math.random() * 25) + 18;
-          formula = `${a} ＋ ${b} ＝ ？`;
-          ans = a + b;
-          explanation = `進位加法：個位滿十進位到十位，答案為 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>個位相加滿十記得進位！`;
-        } else if (type === 3) {
-          const a = Math.floor(Math.random() * 30) + 52;
-          const b = Math.floor(Math.random() * 20) + 18;
+          explanation = `加法直式計算：${a} ＋ ${b} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>個位相加、十位相加，滿十要進位！`;
+        } else if (stageId === "kanto_3") { // 二位數退位減法
+          const a = Math.floor(Math.random() * 40) + 50;
+          const b = Math.floor(Math.random() * 25) + 16;
           formula = `${a} － ${b} ＝ ？`;
           ans = a - b;
-          explanation = `退位減法：向十位借 1 當 10，答案為 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>個位不夠減向十位借 1！`;
-        } else {
-          const cost = Math.floor(Math.random() * 25) + 15;
-          formula = `買 ${cost} 元的精靈球，付 50 元應找回多少元？`;
-          ans = 50 - cost;
-          explanation = `找錢問題：50 － ${cost} ＝ ${ans} 元`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>用付的 50 元減去價錢 ${cost} 元！`;
+          explanation = `退位減法：個位不夠減向十位借 1，答案為 ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>向十位借 1 個十當 10 來減！`;
+        } else { // 乘法與加減綜合
+          const type = Math.floor(Math.random() * 2);
+          if (type === 0) {
+            const a = Math.floor(Math.random() * 8) + 2;
+            const b = Math.floor(Math.random() * 8) + 2;
+            formula = `${a} 的 ${b} 倍是多少？`;
+            ans = a * b;
+            explanation = `${a} × ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>計算 ${a} × ${b} 即可！`;
+          } else {
+            const cost = Math.floor(Math.random() * 30) + 15;
+            formula = `小智拿 50 元買 ${cost} 元的神奇果汁，應找回多少元？`;
+            ans = 50 - cost;
+            explanation = `找錢計算：50 － ${cost} ＝ ${ans} 元`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>50 減去 ${cost} 等於找回的錢！`;
+          }
         }
       } else {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
+        if (stageId === "kalos_1") { // 公尺公分長度
           const m = Math.floor(Math.random() * 5) + 1;
           const cm = Math.floor(Math.random() * 70) + 15;
           formula = `${m} 公尺 ${cm} 公分 ＝ 多少公分？`;
           ans = m * 100 + cm;
-          explanation = `${m} 公尺 ＝ ${m*100} 公分，加上 ${cm} ＝ ${ans} 公分`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>1 公尺 ＝ 100 公分，算 ${m}×100 ＋ ${cm}！`;
-        } else if (type === 1) {
-          const count = (Math.floor(Math.random() * 6) + 3) * 4;
-          formula = `${count} 顆樹果，每 4 顆裝一袋，可裝幾袋？`;
-          ans = count / 4;
-          explanation = `分裝除法：${count} ÷ 4 ＝ ${ans} 袋`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>4 乘以多少等於 ${count}？`;
-        } else if (type === 2) {
-          const h = Math.floor(Math.random() * 4) + 2;
-          formula = `上午 9 點再過 ${h} 小時是下午幾點？`;
-          ans = (9 + h) - 12;
-          explanation = `9 點再過 ${h} 小時是 12 點過後的下午 ${ans} 點`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>先算 9 ＋ ${h} ＝ ${9+h}，超過 12 點要減 12！`;
-        } else if (type === 3) {
-          const a = Math.floor(Math.random() * 200) + 150;
-          const b = Math.floor(Math.random() * 150) + 100;
-          formula = `${a} ＋ ${b} ＝ ？`;
-          ans = a + b;
-          explanation = `三位數直式加法：答案為 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>三位數直式對齊相加！`;
-        } else {
-          const total = (Math.floor(Math.random() * 5) + 3) * 5;
-          formula = `${total} 顆糖果平分給 5 個人，每人得幾顆？`;
-          ans = total / 5;
-          explanation = `平分計算：${total} ÷ 5 ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>5 乘以多少等於 ${total}？`;
+          explanation = `1 公尺 ＝ 100 公分，${m} 公尺 ＝ ${m*100} 公分，再加上 ${cm} ＝ ${ans} 公分`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>${m} 公尺是 ${m*100} 公分，再加上 ${cm} 公分！`;
+        } else if (stageId === "kalos_2") { // 分裝與平分除法
+          const b = Math.floor(Math.random() * 4) + 2;
+          const ansQ = Math.floor(Math.random() * 6) + 3;
+          const total = b * ansQ;
+          formula = `${total} 顆樹果平分給 ${b} 隻寶可夢，每隻分得幾顆？`;
+          ans = ansQ;
+          explanation = `平分計算：${total} ÷ ${b} ＝ ${ans} 顆`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>想一想 ${b} 乘以多少會等於 ${total}？`;
+        } else if (stageId === "kalos_3") { // 鐘面與時間計算
+          const h = Math.floor(Math.random() * 3) + 2;
+          formula = `現在是上午 8 點 10 分，再過 ${h} 小時是上午幾點 10 分？`;
+          ans = 8 + h;
+          explanation = `時間計算：8 ＋ ${h} ＝ ${ans} 點`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>直接將 8 點加上 ${h} 個小時！`;
+        } else { // 二年級生活長度與計量冠軍
+          const a = (Math.floor(Math.random() * 4) + 2) * 100;
+          formula = `${a} 公分等於多少公尺？`;
+          ans = a / 100;
+          explanation = `100 公分 ＝ 1 公尺，${a} 公分 ＝ ${ans} 公尺`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>每 100 公分等於 1 公尺！`;
         }
       }
     }
 
-    // =========================================================================
-    // 三年級 (Grade 3)
-    // =========================================================================
+    // =========================== 3年級 ===========================
     else if (grade === 3) {
       if (region === "kanto") {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
-          const den = [6, 7, 8, 9][Math.floor(Math.random() * 4)];
-          const a = Math.floor(Math.random() * (den - 2)) + 1;
-          const b = Math.floor(Math.random() * (den - a - 1)) + 1;
-          formula = `${a}/${den} ＋ ${b}/${den} ＝ x/${den}，求分子 x`;
-          ans = a + b;
-          explanation = `同分母相加：分子 ${a} ＋ ${b} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>分母不變，分子直接相加！`;
-        } else if (type === 1) {
-          const d1 = Math.floor(Math.random() * 5) + 1;
-          const d2 = Math.floor(Math.random() * 4) + 1;
-          formula = `0.${d1} ＋ 0.${d2} ＝ ？`;
-          ans = parseFloat(((d1 + d2) / 10).toFixed(1));
-          explanation = `小數加法：${d1}個0.1加${d2}個0.1 ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊算 ${d1} ＋ ${d2}！`;
-        } else if (type === 2) {
+        if (stageId === "kanto_1") { // 三位數直式乘法與加減
           const a = Math.floor(Math.random() * 150) + 120;
           const b = Math.floor(Math.random() * 3) + 2;
           formula = `${a} × ${b} ＝ ？`;
           ans = a * b;
           explanation = `三位數乘一位數：${a} × ${b} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>由個位往百位依序乘上 ${b}！`;
-        } else if (type === 3) {
+          hintGuide = `💡 <b>皮卡丘引導：</b>從個位往百位依序乘上 ${b}！`;
+        } else if (stageId === "kanto_2") { // 除法初步與三位數除以一位數
           const divisor = Math.floor(Math.random() * 4) + 2;
           const quotient = Math.floor(Math.random() * 40) + 20;
           const dividend = divisor * quotient;
           formula = `${dividend} ÷ ${divisor} ＝ ？`;
           ans = quotient;
-          explanation = `除法計算：${dividend} ÷ ${divisor} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>直式除法算算看商是多少！`;
-        } else {
-          const den = 9;
-          const a = Math.floor(Math.random() * 4) + 5;
-          const b = Math.floor(Math.random() * 3) + 1;
-          formula = `${a}/${den} － ${b}/${den} ＝ x/${den}，求分子 x`;
-          ans = a - b;
-          explanation = `同分母相減：分子相減 ${a} － ${b} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>算分子 ${a} － ${b}！`;
-        }
-      } else {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
-          const l = Math.floor(Math.random() * 6) + 4;
-          const w = Math.floor(Math.random() * 3) + 2;
-          formula = `長 ${l}cm、寬 ${w}cm 的長方形面積？`;
-          ans = l * w;
-          explanation = `面積 ＝ 長 × 寬 ＝ ${l} × ${w} ＝ ${ans} cm²`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>面積公式 ＝ 長 × 寬！`;
-        } else if (type === 1) {
-          const s = Math.floor(Math.random() * 6) + 3;
-          formula = `邊長 ${s}cm 的正方形「周長」是多少 cm？`;
-          ans = s * 4;
-          explanation = `正方形周長 ＝ 邊長 × 4 ＝ ${ans} cm`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>4 個邊一樣長，邊長乘以 4！`;
-        } else if (type === 2) {
-          const kg = Math.floor(Math.random() * 4) + 2;
-          const g = Math.floor(Math.random() * 5) * 100 + 200;
-          formula = `${kg} 公斤 ${g} 公克 ＝ 多少公克？`;
-          ans = kg * 1000 + g;
-          explanation = `1 公斤 ＝ 1000 公克，${kg} 公斤 ＝ ${kg*1000} 公克，加上 ${g} ＝ ${ans} 公克`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${kg} 公斤 ＝ ${kg*1000} 公克！`;
-        } else if (type === 3) {
-          const s = Math.floor(Math.random() * 5) + 3;
-          formula = `邊長 ${s}cm 的正方形「面積」是多少 cm²？`;
-          ans = s * s;
-          explanation = `正方形面積 ＝ 邊長 × 邊長 ＝ ${s} × ${s} ＝ ${ans} cm²`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>邊長 × 邊長！`;
-        } else {
-          const h = Math.floor(Math.random() * 3) + 2;
-          formula = `${h} 小時等於多少分鐘？`;
-          ans = h * 60;
-          explanation = `1 小時 ＝ 60 分鐘，${h} 小時 ＝ ${h} × 60 ＝ ${ans} 分鐘`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>每小時 60 分鐘，算 ${h} × 60！`;
-        }
-      }
-    }
-
-    // =========================================================================
-    // 四年級 (Grade 4) - 全面擴充題型，徹底移除死板單一問題
-    // =========================================================================
-    else if (grade === 4) {
-      if (region === "kanto") {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
-          const a = (Math.floor(Math.random() * 30) + 10) / 100;
-          const b = (Math.floor(Math.random() * 30) + 10) / 100;
-          formula = `${a.toFixed(2)} ＋ ${b.toFixed(2)} ＝ ？`;
-          ans = parseFloat((a + b).toFixed(2));
-          explanation = `二位小數相加：${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊相加！`;
-        } else if (type === 1) {
-          const w = Math.floor(Math.random() * 3) + 1;
-          const num = Math.floor(Math.random() * 3) + 1;
-          formula = `帶分數 ${w} 又 ${num}/5 化為假分數的分子？`;
-          ans = w * 5 + num;
-          explanation = `${w} 又 ${num}/5 ＝ (${w}×5＋${num})/5 ＝ ${ans}/5`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>整數乘分母加上分子！`;
-        } else if (type === 2) {
-          const a = Math.floor(Math.random() * 20) + 40;
-          const b = Math.floor(Math.random() * 4) + 2;
+          explanation = `除法直式計算：${dividend} ÷ ${divisor} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>想一想 ${divisor} 乘多少剛好是 ${dividend}！`;
+        } else if (stageId === "kanto_3") { // 整數四則混合
+          const a = Math.floor(Math.random() * 30) + 50;
+          const b = Math.floor(Math.random() * 5) + 3;
           const c = Math.floor(Math.random() * 4) + 2;
           formula = `${a} － ${b} × ${c} ＝ ？`;
           ans = a - b * c;
           explanation = `先乘除後加減：${a} － ${b*c} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>先算乘法 ${b} × ${c}，再算相減！`;
-        } else if (type === 3) {
-          const a = (Math.floor(Math.random() * 40) + 50) / 100;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${b} × ${c} 再相減！`;
+        } else { // 關東4 烈焰火山【冠軍關：分數與小數的榮耀試煉】-> 100% 只出分數與小數！
+          const type = Math.floor(Math.random() * 4);
+          if (type === 0) { // 同分母分數加法
+            const den = [6, 7, 8, 9, 10][Math.floor(Math.random() * 5)];
+            const a = Math.floor(Math.random() * (den - 2)) + 1;
+            const b = Math.floor(Math.random() * (den - a - 1)) + 1;
+            formula = `${a}/${den} ＋ ${b}/${den} ＝ x/${den}，求分子 x`;
+            ans = a + b;
+            explanation = `同分母分數相加，分母不變分子相加：${a} ＋ ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>分母 ${den} 不變，把分子相加 (${a} ＋ ${b})！`;
+          } else if (type === 1) { // 同分母分數減法
+            const den = [6, 7, 8, 9, 10][Math.floor(Math.random() * 5)];
+            const a = Math.floor(Math.random() * 3) + 4;
+            const b = Math.floor(Math.random() * 3) + 1;
+            formula = `${a}/${den} － ${b}/${den} ＝ x/${den}，求分子 x`;
+            ans = a - b;
+            explanation = `同分母分數相減：分子相減 ${a} － ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>分母不變，算分子 ${a} － ${b} ＝ ？`;
+          } else if (type === 2) { // 一位小數直式加法
+            const d1 = Math.floor(Math.random() * 5) + 1;
+            const d2 = Math.floor(Math.random() * 4) + 1;
+            formula = `0.${d1} ＋ 0.${d2} ＝ ？`;
+            ans = parseFloat(((d1 + d2) / 10).toFixed(1));
+            explanation = `小數加法：${d1}個0.1加上${d2}個0.1等於 ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊算 ${d1} ＋ ${d2}！`;
+          } else { // 一位小數減法
+            const d1 = Math.floor(Math.random() * 4) + 5;
+            const d2 = Math.floor(Math.random() * 4) + 1;
+            formula = `1.${d1} － 0.${d2} ＝ ？`;
+            ans = parseFloat((1 + (d1 - d2) / 10).toFixed(1));
+            explanation = `小數減法：1.${d1} － 0.${d2} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊，算十分位相減 (${d1} － ${d2})！`;
+          }
+        }
+      } else {
+        if (stageId === "kalos_1") { // 長方形面積
+          const l = Math.floor(Math.random() * 6) + 4;
+          const w = Math.floor(Math.random() * 3) + 2;
+          formula = `長 ${l}cm、寬 ${w}cm 的長方形面積？`;
+          ans = l * w;
+          explanation = `長方形面積 ＝ 長 × 寬 ＝ ${ans} cm²`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>長方形面積公式 ＝ 長 × 寬！`;
+        } else if (stageId === "kalos_2") { // 正方形周長與面積
+          const s = Math.floor(Math.random() * 6) + 3;
+          formula = `邊長 ${s}cm 的正方形周長是多少 cm？`;
+          ans = s * 4;
+          explanation = `正方形周長 ＝ 邊長 × 4 ＝ ${ans} cm`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>正方形 4 個邊一樣長，邊長乘以 4！`;
+        } else if (stageId === "kalos_3") { // 重量公斤與公克
+          const kg = Math.floor(Math.random() * 4) + 2;
+          const g = Math.floor(Math.random() * 5) * 100 + 200;
+          formula = `${kg} 公斤 ${g} 公克 ＝ 多少公克？`;
+          ans = kg * 1000 + g;
+          explanation = `1 公斤 ＝ 1000 公克，答案為 ${ans} 公克`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${kg} 公斤 ＝ ${kg*1000} 公克，再加上 ${g} 公克！`;
+        } else { // 幾何與計量終極
+          const l = Math.floor(Math.random() * 5) + 5;
+          const w = Math.floor(Math.random() * 3) + 2;
+          formula = `長 ${l}cm、寬 ${w}cm 的長方形周長是多少 cm？`;
+          ans = (l + w) * 2;
+          explanation = `長方形周長 ＝ (長 ＋ 寬) × 2 ＝ (${l}＋${w})×2 ＝ ${ans} cm`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算長加寬，再乘以 2！`;
+        }
+      }
+    }
+
+    // =========================== 4年級 ===========================
+    else if (grade === 4) {
+      if (region === "kanto") {
+        if (stageId === "kanto_1") { // 二位小數加法減法
+          const a = (Math.floor(Math.random() * 30) + 10) / 100;
           const b = (Math.floor(Math.random() * 30) + 10) / 100;
+          formula = `${a.toFixed(2)} ＋ ${b.toFixed(2)} ＝ ？`;
+          ans = parseFloat((a + b).toFixed(2));
+          explanation = `二位小數直式加法：${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊相加！`;
+        } else if (stageId === "kanto_2") { // 假分數帶分數互換
+          const w = Math.floor(Math.random() * 3) + 1;
+          const num = Math.floor(Math.random() * 3) + 1;
+          formula = `帶分數 ${w} 又 ${num}/5 化為假分數的分子是多少？`;
+          ans = w * 5 + num;
+          explanation = `${w} 又 ${num}/5 ＝ (${w}×5＋${num})/5 ＝ ${ans}/5`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>整數乘分母加上分子！`;
+        } else if (stageId === "kanto_3") { // 億以內大數字計算
+          const wan = Math.floor(Math.random() * 5) + 3;
+          formula = `${wan} 萬 ＋ 4 萬 ＝ 多少萬？`;
+          ans = wan + 4;
+          explanation = `${wan} 萬 ＋ 4 萬 ＝ ${ans} 萬`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>直接算 ${wan} ＋ 4 ＝ ？`;
+        } else { // 分數與小數大決戰
+          const a = (Math.floor(Math.random() * 40) + 40) / 100;
+          const b = (Math.floor(Math.random() * 20) + 10) / 100;
           formula = `${a.toFixed(2)} － ${b.toFixed(2)} ＝ ？`;
           ans = parseFloat((a - b).toFixed(2));
-          explanation = `二位小數直式相減：${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊直式相減！`;
-        } else {
-          const wan = Math.floor(Math.random() * 6) + 3;
-          formula = `${wan} 個一萬 加上 5 個一千 是多少？`;
-          ans = wan * 10000 + 5000;
-          explanation = `${wan} 萬 ＋ 5 千 ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>${wan} 個萬是 ${wan*10000}，加上 5000！`;
+          explanation = `二位小數相減：${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>小數點對齊相減！`;
         }
-      } else { // 四下（破滅之翼）：角度計算、等腰三角、括號四則、小數乘法、公里公尺
-        const type = Math.floor(Math.random() * 6);
-        if (type === 0) {
-          // 三角形求第三角（角度多變）
-          const ang1 = Math.floor(Math.random() * 40) + 40; // 40~79度
-          const ang2 = Math.floor(Math.random() * 40) + 30; // 30~69度
-          formula = `三角形兩角為 ${ang1}° 與 ${ang2}°，第三個角是多少度？`;
-          ans = 180 - ang1 - ang2;
-          explanation = `三角形內角和 180°：180° － ${ang1}° － ${ang2}° ＝ ${ans}°`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>三角形內角總和是 180°，用 180 減去另外兩個角！`;
-        } else if (type === 1) {
-          // 等腰三角形求底角
-          const topAng = (Math.floor(Math.random() * 30) + 20) * 2; // 頂角偶數 40~98度
-          formula = `等腰三角形頂角是 ${topAng}°，請問一個底角是多少度？`;
-          ans = (180 - topAng) / 2;
-          explanation = `等腰三角形兩底角相等：(180° － ${topAng}°) ÷ 2 ＝ ${ans}°`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>先算 180° 減頂角 ${topAng}° ＝ ${180-topAng}°，再除以 2！`;
-        } else if (type === 2) {
-          // 四邊形求第四角
-          const a = 80, b = 100, c = Math.floor(Math.random() * 30) + 80;
-          formula = `四邊形的三個角為 80°, 100°, ${c}°，第四個角是多少度？`;
-          ans = 360 - 80 - 100 - c;
-          explanation = `四邊形內角和 360°：360° － 80° － 100° － ${c}° ＝ ${ans}°`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>四邊形四個角加起來是 360°，用 360 減去已知的角！`;
-        } else if (type === 3) {
-          // 括號先算四則混合
+      } else {
+        if (stageId === "kalos_1") { // 括號先算四則混合
           const a = Math.floor(Math.random() * 6) + 4;
           const b = Math.floor(Math.random() * 6) + 3;
           const c = Math.floor(Math.random() * 4) + 2;
           formula = `(${a} ＋ ${b}) × ${c} ＝ ？`;
           ans = (a + b) * c;
           explanation = `括號先算：(${a+b}) × ${c} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>先算括號裡面的加法，再算乘法！`;
-        } else if (type === 4) {
-          // 小數乘整數
-          const base = (Math.floor(Math.random() * 4) + 1) * 0.25; // 0.25, 0.5, 0.75, 1.0
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算括號裡面的加法，再乘上 ${c}！`;
+        } else if (stageId === "kalos_2") { // 卡洛斯2 破滅之翼【多邊形角度與等腰三角形】-> 題目多元豐富！
+          const type = Math.floor(Math.random() * 3);
+          if (type === 0) { // 求三角形第三角（動態數字）
+            const ang1 = Math.floor(Math.random() * 40) + 40;
+            const ang2 = Math.floor(Math.random() * 35) + 30;
+            formula = `三角形兩角為 ${ang1}° 與 ${ang2}°，第三個角是多少度？`;
+            ans = 180 - ang1 - ang2;
+            explanation = `180° － ${ang1}° － ${ang2}° ＝ ${ans}°`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>三角形內角總和是 180°，用 180 減去已知的兩個角！`;
+          } else if (type === 1) { // 等腰三角形求底角
+            const topAng = (Math.floor(Math.random() * 25) + 20) * 2;
+            formula = `等腰三角形頂角是 ${topAng}°，請問一個底角是多少度？`;
+            ans = (180 - topAng) / 2;
+            explanation = `(180° － ${topAng}°) ÷ 2 ＝ ${ans}°`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>先算 180° 減頂角 ${topAng}°，再除以 2！`;
+          } else { // 四邊形求第四角
+            const a = 70, b = 110, c = Math.floor(Math.random() * 30) + 80;
+            formula = `四邊形的三角為 70°, 110°, ${c}°，第四個角是多少度？`;
+            ans = 360 - 70 - 110 - c;
+            explanation = `360° － 70° － 110° － ${c}° ＝ ${ans}°`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>四邊形四角和是 360°，用 360 減去三個已知角！`;
+          }
+        } else if (stageId === "kalos_3") { // 公里公尺與小數乘整數
+          const km = Math.floor(Math.random() * 4) + 2;
+          const m = Math.floor(Math.random() * 5) * 100 + 250;
+          formula = `${km} 公里 ${m} 公尺 ＝ 多少公尺？`;
+          ans = km * 1000 + m;
+          explanation = `1 公里 ＝ 1000 公尺，答案為 ${ans} 公尺`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${km} 公里 ＝ ${km*1000} 公尺！`;
+        } else { // 四年級冠軍殿堂
+          const base = (Math.floor(Math.random() * 4) + 1) * 0.25;
           const times = Math.floor(Math.random() * 6) + 2;
           formula = `${base} × ${times} ＝ ？`;
           ans = parseFloat((base * times).toFixed(2));
           explanation = `小數乘法：${base} × ${times} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>當作整數相乘後，再點對小數點！`;
-        } else {
-          // 公里與公尺換算
-          const km = Math.floor(Math.random() * 4) + 2;
-          const m = Math.floor(Math.random() * 5) * 100 + 300;
-          formula = `${km} 公里 ${m} 公尺 ＝ 多少公尺？`;
-          ans = km * 1000 + m;
-          explanation = `1 公里 ＝ 1000 公尺，${km} 公里 ＝ ${km*1000} 公尺，加上 ${m} ＝ ${ans} 公尺`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>1 公里 ＝ 1000 公尺，先算 ${km} 公里等於幾公尺！`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>乘好之後點上正確的小數位！`;
         }
       }
     }
 
-    // =========================================================================
-    // 五年級 (Grade 5)
-    // =========================================================================
+    // =========================== 5年級 ===========================
     else if (grade === 5) {
       if (region === "kanto") {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
+        if (stageId === "kanto_1") { // 因數倍數與公因數
           const a = (Math.floor(Math.random() * 3) + 2) * 2;
           const b = (Math.floor(Math.random() * 3) + 2) * 3;
           formula = `求 (${a}, ${b}) 的最大公因數`;
           ans = getGCD(a, b);
           explanation = `最大公因數為 ${ans}`;
           hintGuide = `💡 <b>皮卡丘引導：</b>用短除法找出兩數最大公因數！`;
-        } else if (type === 1) {
-          const a = Math.floor(Math.random() * 3) + 2;
-          const b = Math.floor(Math.random() * 3) + 4;
-          formula = `求 [${a}, ${b}] 的最小公倍數`;
-          ans = getLCM(a, b);
-          explanation = `最小公倍數為 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>找兩數的第一個共同倍數！`;
-        } else if (type === 2) {
-          const base = (Math.floor(Math.random() * 4) + 2) * 2;
-          const h = Math.floor(Math.random() * 5) + 3;
-          formula = `底 ${base}cm、高 ${h}cm 的三角形面積？`;
-          ans = (base * h) / 2;
-          explanation = `(底 × 高) ÷ 2 ＝ (${base} × ${h}) ÷ 2 ＝ ${ans} cm²`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>三角形面積公式 ＝ (底 × 高) ÷ 2！`;
-        } else if (type === 3) {
-          const base = Math.floor(Math.random() * 6) + 4;
-          const h = Math.floor(Math.random() * 5) + 3;
-          formula = `底 ${base}cm、高 ${h}cm 的平行四邊形面積？`;
-          ans = base * h;
-          explanation = `平行四邊形面積 ＝ 底 × 高 ＝ ${ans} cm²`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>底 × 高（不用除以 2 喔）！`;
-        } else {
+        } else if (stageId === "kanto_2") { // 異分母分數通分加減
+          formula = `1/2 ＋ 1/4 ＝ x/4，求分子 x`;
+          ans = 3;
+          explanation = `通分：2/4 ＋ 1/4 ＝ 3/4，分子為 3`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先把 1/2 通分變成 2/4！`;
+        } else if (stageId === "kanto_3") { // 整數四則混合
+          const a = Math.floor(Math.random() * 20) + 15;
+          const b = Math.floor(Math.random() * 5) + 2;
+          const c = Math.floor(Math.random() * 4) + 2;
+          formula = `${a} ＋ ${b} × ${c} ＝ ？`;
+          ans = a + b * c;
+          explanation = `先乘除後加減：${a} ＋ ${b*c} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${b} × ${c} 再加上 ${a}！`;
+        } else { // 平行四邊形與梯形面積
           const top = Math.floor(Math.random() * 3) + 3;
           const btm = Math.floor(Math.random() * 3) + 6;
           const h = (Math.floor(Math.random() * 2) + 2) * 2;
@@ -2341,119 +2279,95 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>(上底 ＋ 下底) × 高 ÷ 2！`;
         }
       } else {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
+        if (stageId === "kalos_1") { // 分數乘以整數
+          const num = Math.floor(Math.random() * 3) + 1;
+          const den = 7;
+          const times = Math.floor(Math.random() * 3) + 2;
+          formula = `${num}/${den} × ${times} ＝ x/${den}，求分子 x`;
+          ans = num * times;
+          explanation = `分母不變，分子乘整數：${num} × ${times} ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>分子 ${num} 乘上 ${times}！`;
+        } else if (stageId === "kalos_2") { // 正方體長方體體積
           const s = Math.floor(Math.random() * 3) + 2;
-          formula = `邊長 ${s}cm 的正方體體積？`;
+          formula = `邊長 ${s}cm 的正方體體積是多少 cm³？`;
           ans = s * s * s;
-          explanation = `邊長³ ＝ ${s} × ${s} × ${s} ＝ ${ans} cm³`;
+          explanation = `${s} × ${s} × ${s} ＝ ${ans} cm³`;
           hintGuide = `💡 <b>皮卡丘引導：</b>邊長連乘三次！`;
-        } else if (type === 1) {
-          const l = Math.floor(Math.random() * 4) + 3;
-          const w = Math.floor(Math.random() * 3) + 2;
-          const h = Math.floor(Math.random() * 3) + 2;
-          formula = `長 ${l}cm、寬 ${w}cm、高 ${h}cm 長方體體積？`;
-          ans = l * w * h;
-          explanation = `長 × 寬 × 高 ＝ ${ans} cm³`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>長 × 寬 × 高！`;
-        } else if (type === 2) {
+        } else if (stageId === "kalos_3") { // 容量容積換算
+          const ltr = Math.floor(Math.random() * 4) + 2;
+          formula = `${ltr} 公升等於多少毫升 (ml)？`;
+          ans = ltr * 1000;
+          explanation = `1 公升 ＝ 1000 毫升，答案為 ${ans} 毫升`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>1 公升 ＝ 1000 毫升！`;
+        } else { // 百分率折數總決賽
           const orig = (Math.floor(Math.random() * 4) + 2) * 100;
           formula = `定價 ${orig} 元打八折 (80%) 是多少元？`;
           ans = Math.round(orig * 0.8);
           explanation = `${orig} × 0.8 ＝ ${ans} 元`;
           hintGuide = `💡 <b>皮卡丘引導：</b>打八折代表乘以 0.8！`;
-        } else if (type === 3) {
-          const s = Math.floor(Math.random() * 3) + 2;
-          formula = `邊長 ${s}cm 的正方體「表面積」是多少 cm²？`;
-          ans = s * s * 6;
-          explanation = `6 個面：${s} × ${s} × 6 ＝ ${ans} cm²`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>一個面的面積乘 6！`;
-        } else {
-          const ltr = Math.floor(Math.random() * 4) + 2;
-          formula = `${ltr} 公升等於多少毫升 (ml)？`;
-          ans = ltr * 1000;
-          explanation = `1 公升 ＝ 1000 毫升，${ltr} 公升 ＝ ${ans} 毫升`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>1 公升等於 1000 毫升！`;
         }
       }
     }
 
-    // =========================================================================
-    // 六年級 (Grade 6)
-    // =========================================================================
+    // =========================== 6年級 ===========================
     else {
       if (region === "kanto") {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
+        if (stageId === "kanto_1") { // 最簡整數比與比例式
           const a = (Math.floor(Math.random() * 3) + 2) * 2;
           const b = (Math.floor(Math.random() * 3) + 2) * 3;
           const g = getGCD(a, b);
           formula = `化簡 ${a} : ${b} 最簡整數比前項？`;
           ans = a / g;
-          explanation = `同除以公因數 ${g}，前項為 ${ans}`;
+          explanation = `同除以最大公因數 ${g}，前項為 ${ans}`;
           hintGuide = `💡 <b>皮卡丘引導：</b>兩邊同除以最大公因數！`;
-        } else if (type === 1) {
+        } else if (stageId === "kanto_2") { // 圓周長與圓面積
           const r = (Math.floor(Math.random() * 3) + 1) * 2;
           formula = `半徑 ${r}cm 的圓面積？ (π=3.14)`;
           ans = parseFloat((r * r * 3.14).toFixed(2));
           explanation = `${r} × ${r} × 3.14 ＝ ${ans}`;
           hintGuide = `💡 <b>皮卡丘引導：</b>半徑 × 半徑 × 3.14！`;
-        } else if (type === 2) {
-          const d = (Math.floor(Math.random() * 4) + 2) * 2;
-          formula = `直徑 ${d}cm 的圓周長？ (π=3.14)`;
-          ans = parseFloat((d * 3.14).toFixed(2));
-          explanation = `直徑 × 3.14 ＝ ${d} × 3.14 ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>直徑 × 3.14！`;
-        } else if (type === 3) {
+        } else if (stageId === "kanto_3") { // 分數除法與小數除法
+          const num = Math.floor(Math.random() * 4) + 2;
+          formula = `${num * 3} ÷ 1/3 ＝ ？`;
+          ans = num * 9;
+          explanation = `除以分數等於乘以倒數：${num * 3} × 3 ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>除以 1/3 等於乘以 3！`;
+        } else { // 扇形弧長面積
           formula = `半徑 6cm、圓心角 90° 扇形面積？ (π=3.14)`;
           ans = 28.26;
           explanation = `6 × 6 × 3.14 × (90/360) ＝ 28.26`;
           hintGuide = `💡 <b>皮卡丘引導：</b>整圓面積除以 4！`;
-        } else {
-          const a = 4, b = 6, c = 8;
-          formula = `${a} : ${b} ＝ ${c} : x，求 x`;
-          ans = (b * c) / a;
-          explanation = `內項相乘除以外項：(${b}×${c})÷${a} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>比例式內項相乘等於外項相乘！`;
         }
       } else {
-        const type = Math.floor(Math.random() * 5);
-        if (type === 0) {
+        if (stageId === "kalos_1") { // 未知數方程式移項
           const x = Math.floor(Math.random() * 5) + 2;
           const b = Math.floor(Math.random() * 8) + 4;
           formula = `3x ＋ ${b} ＝ ${3 * x + b}，求 x`;
           ans = x;
-          explanation = `移項計算：3x ＝ ${3*x}，x ＝ ${ans}`;
+          explanation = `移項求解：3x ＝ ${3*x}，x ＝ ${ans}`;
           hintGuide = `💡 <b>皮卡丘引導：</b>先減去 ${b} 再除以 3！`;
-        } else if (type === 1) {
-          formula = `雞兔共 10 隻，腳共 28 隻，兔有幾隻？`;
-          ans = 4;
-          explanation = `假設全為雞共 20 腳，多 8 腳 ÷ 2 ＝ 4 隻兔`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>多出的腳數除以 2！`;
-        } else if (type === 2) {
-          const spd = 60, hrs = 3;
-          formula = `時速 60 公里行駛 3 小時，共行駛幾公里？`;
-          ans = spd * hrs;
-          explanation = `距離 ＝ 速率 × 時間 ＝ 60 × 3 ＝ 180 km`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>速率 × 時間 ＝ 距離！`;
-        } else if (type === 3) {
+        } else if (stageId === "kalos_2") { // 速率相遇追趕
           const dist = 180, spd1 = 40, spd2 = 50;
           formula = `甲時速 40、乙時速 50 相向而行，距 180km 幾小時相遇？`;
           ans = dist / (spd1 + spd2);
-          explanation = `相遇時間 ＝ 距離 ÷ 速度和 ＝ 180 ÷ (40＋50) ＝ ${ans} 小時`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>總距離除以兩人速度之和！`;
-        } else {
-          const a = Math.floor(Math.random() * 3) + 2;
-          const x = Math.floor(Math.random() * 4) + 2;
-          formula = `${a}(x ＋ 3) ＝ ${a * (x + 3)}，求 x`;
-          ans = x;
-          explanation = `兩邊除以 ${a} 得 x ＋ 3 ＝ ${x+3}，x ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>兩邊先除以 ${a}！`;
+          explanation = `180 ÷ (40＋50) ＝ ${ans} 小時`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>總距離除以速度之和！`;
+        } else if (stageId === "kalos_3") { // 角柱圓柱體積表面積
+          const r = 2, h = 5;
+          formula = `底半徑 2cm、高 5cm 的圓柱體積？ (π=3.14)`;
+          ans = parseFloat((2 * 2 * 3.14 * 5).toFixed(2));
+          explanation = `底面積 × 高 ＝ 2 × 2 × 3.14 × 5 ＝ ${ans}`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>底面積乘柱高！`;
+        } else { // 雞兔同籠終極殿堂
+          formula = `雞兔共 10 隻，腳共 28 隻，兔有幾隻？`;
+          ans = 4;
+          explanation = `多 8 隻腳 ÷ 2 ＝ 4 隻兔`;
+          hintGuide = `💡 <b>皮卡丘引導：</b>多出的腳數除以 2！`;
         }
       }
     }
 
-    // 安全生成 4 個不重複選項
+    // 生成干擾選項
     const options = new Set([ans]);
     let optAttempts = 0;
     while (options.size < 4 && optAttempts < 50) {
@@ -2601,7 +2515,7 @@
     document.getElementById("header-map-btn").style.display = "inline-block";
     document.getElementById("header-back-btn").style.display = "inline-block";
 
-    document.getElementById("header-stage-name").innerText = `⚔️ ${currentGrade}年級：[${stageObj.diffName}] ${stageObj.name}`;
+    document.getElementById("header-stage-name").innerText = `⚔️ ${currentGrade}年級：${stageObj.name}`;
 
     document.getElementById("player-name").innerText = starter.stage1.name;
     const pType = starter.stage1.type;
@@ -2633,7 +2547,6 @@
   }
 
   function nextQuestion() {
-    // 嚴格規定：題數未答完前絕對不提早結束，確保孩子能完整做完所有題目
     if (currentQuestionCount >= totalStageQuestions || playerHp <= 0) {
       endBattle(correctCount >= Math.ceil(totalStageQuestions * 0.7));
       return;
@@ -2642,7 +2555,7 @@
     isAnswering = false;
     isHintActiveForCurrentQ = false;
     currentQuestionCount++;
-    currentProblemObj = generateMathProblemNoDup(currentGrade, currentRegion, currentQuestionCount, totalStageQuestions);
+    currentProblemObj = generateMathProblemNoDup(currentGrade, currentRegion, currentStageObj.id, currentQuestionCount, totalStageQuestions);
     currentAns = currentProblemObj.ans;
 
     let tierName = totalStageQuestions === 20 
@@ -2731,7 +2644,6 @@
       spell.innerText = isCrit ? "⚡💥🌟" : currentStageData.spell;
       spell.classList.add("active");
 
-      // 平衡扣血：每題平均扣除相應比例，並加上「1 HP 鎖血保底」，絕不提前陣亡
       let rawDamage = (100 / totalStageQuestions);
       if (starter.isBoss) rawDamage *= 1.5; 
       let totalDamage = Math.ceil(rawDamage);
@@ -2898,7 +2810,7 @@
     }, 3600);
   }
 
-  /* ================= 結算彈窗與成績登錄 (90% 捕獲判定) ================= */
+  /* ================= 結算彈窗與成績登錄 ================= */
   function endBattle(isWin) {
     const timeUsed = Math.max(1, Math.floor((Date.now() - startTime) / 1000));
     const accuracy = Math.round((correctCount / totalStageQuestions) * 100);
