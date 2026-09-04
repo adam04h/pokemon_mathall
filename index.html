@@ -791,7 +791,6 @@
     @keyframes shake { 10%, 90% { transform: translate3d(-4px, 0, 0); } 30%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
     @keyframes blink { 50% { opacity: 0.1; filter: brightness(4); } }
 
-    /* 金幣掉落粒子特效 */
     .coin-particle {
       position: absolute;
       font-size: 24px;
@@ -805,7 +804,6 @@
       100% { transform: translate(var(--tx), 120px) scale(0.8) rotate(360deg); opacity: 0; }
     }
 
-    /* 捕獲神獸動畫 Overlay */
     .catch-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -824,12 +822,8 @@
       position: relative;
     }
 
-    .ball-wobble-success {
-      animation: wobble 0.6s ease-in-out 3;
-    }
-    .ball-wobble-fail {
-      animation: wobble 0.6s ease-in-out 2;
-    }
+    .ball-wobble-success { animation: wobble 0.6s ease-in-out 3; }
+    .ball-wobble-fail { animation: wobble 0.6s ease-in-out 2; }
     @keyframes wobble {
       0%, 100% { transform: rotate(0deg); }
       25% { transform: rotate(-25deg); }
@@ -1181,7 +1175,7 @@
 <body>
 
 <div class="game-container">
-  <!-- 抓寶判定 Overlay (功能 1: 90% 判定與年級隔離) -->
+  <!-- 抓寶判定 Overlay (90% 門檻) -->
   <div id="catch-overlay" class="catch-overlay">
     <div id="catch-title" class="catch-title">✨ 魔王倒下了！進入捕獲階段！ ✨</div>
     <div id="catch-ball-box" class="pokeball-anim">
@@ -1360,10 +1354,9 @@
     </div>
 
     <div class="map-regions-grid">
-      <!-- 卡洛斯地區（下學期） -->
       <div class="region-map-card" onclick="selectRegion('kalos')">
         <div class="region-badge">🏯 卡洛斯地區大賽</div>
-        <div class="region-title" id="card-title-kalos">小學【下學期】挑戰</div>
+        <div class="region-title">小學【下學期】挑戰</div>
         <div class="region-math-badge">下學期精選核心單元</div>
         <div class="region-desc">依年級自動配對下學期單元<br>道館守領：哲爾尼亞斯、伊裴爾塔爾、波爾凱尼恩、冰岩怪</div>
         <div class="region-boss-preview">
@@ -1374,10 +1367,9 @@
         </div>
       </div>
 
-      <!-- 關東地區（上學期） -->
       <div class="region-map-card" onclick="selectRegion('kanto')">
         <div class="region-badge">⚡ 關東地區大賽</div>
-        <div class="region-title" id="card-title-kanto">小學【上學期】挑戰</div>
+        <div class="region-title">小學【上學期】挑戰</div>
         <div class="region-math-badge">上學期精選核心單元</div>
         <div class="region-desc">依年級自動配對上學期單元<br>道館守領：快龍、卡比獸、超夢、火焰鳥</div>
         <div class="region-boss-preview">
@@ -1448,7 +1440,7 @@
         <canvas id="scratchpad-canvas" class="scratchpad-canvas"></canvas>
       </div>
 
-      <!-- 敵方巨大魔王立繪 -->
+      <!-- 敵方魔王立繪 -->
       <img id="opp-sprite" class="sprite opponent" src="" alt="Opponent" />
       
       <!-- 玩家立繪與皮卡丘支援立繪 -->
@@ -1723,7 +1715,7 @@
     }
   };
 
-  /* ================= 年級專屬捕獲魔王存取 (依年級分開儲存) ================= */
+  /* ================= 年級專屬捕獲魔王存取 ================= */
   function getCaughtBossStorageKey(grade) {
     return `pokemon_caught_bosses_g${grade}`;
   }
@@ -1752,7 +1744,6 @@
     }
   }
 
-  // 獲取當前年級可選的角色清單 (魔王出戰設定 10 題)
   function getAllStarters(grade) {
     const combined = { ...BASE_STARTERS };
     const caught = getCaughtBosses(grade);
@@ -1760,7 +1751,7 @@
       combined[b.id] = {
         id: b.id,
         name: b.name,
-        totalQuestions: 10, // 敵方角色改為 10 題速戰
+        totalQuestions: 10,
         isBranch: false,
         isBoss: true,
         stage1: {
@@ -1958,7 +1949,6 @@
     container.innerHTML = "";
     const all = getAllStarters(currentGrade);
 
-    // 如果目前選取的角色不在該年級名單中（例如在其他年級切換過來），重設為預設角色
     if (!all[currentStarterKey]) {
       currentStarterKey = "ceruledge";
     }
@@ -2027,14 +2017,14 @@
     });
   }
 
-  /* ================= 2~6 年級 30 題完全防重複與階梯進化題庫 ================= */
+  /* ================= 2~6 年級完全不重複超多元題庫模組 ================= */
   let usedProblemSignatures = new Set();
 
   function generateMathProblemNoDup(grade, region, qIndex, totalQ) {
     let problem = null;
     let attempts = 0;
 
-    while (attempts < 100) {
+    while (attempts < 120) {
       attempts++;
       problem = createMathProblemRaw(grade, region, qIndex, totalQ);
       const signature = `${problem.formula}_${problem.ans}`;
@@ -2051,56 +2041,213 @@
 
   function createMathProblemRaw(grade, region, qIndex, totalQ) {
     let formula = "", ans = 0, explanation = "", hintGuide = "";
-    const isStage1 = totalQ === 20 ? (qIndex <= 7) : (qIndex <= 10);
-    const isStage2 = totalQ === 20 ? (qIndex > 7 && qIndex <= 14) : (qIndex > 10 && qIndex <= 20);
+    const isStage1 = totalQ === 20 ? (qIndex <= 7) : (totalQ === 10 ? (qIndex <= 4) : (qIndex <= 10));
+    const isStage2 = totalQ === 20 ? (qIndex > 7 && qIndex <= 14) : (totalQ === 10 ? (qIndex > 4 && qIndex <= 7) : (qIndex > 10 && qIndex <= 20));
 
+    // =========================================================================
+    // 二年級 (Grade 2) 全域隨機且豐富擴充
+    // =========================================================================
     if (grade === 2) {
-      if (region === "kanto") {
+      if (region === "kanto") { // 上學期：九九乘法（2~9 全段口訣）、二位數加減、未知數填空、整十數
         if (isStage1) {
-          const a = Math.floor(Math.random() * 8) + 2;
-          const b = Math.floor(Math.random() * 8) + 2;
-          formula = `${a} × ${b} ＝ ？`;
-          ans = a * b;
-          explanation = `九九乘法：${a} × ${b} ＝ ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>背誦乘法口訣「${a}」的那一行！`;
+          const type = Math.floor(Math.random() * 4);
+          if (type === 0) {
+            // 九九乘法：隨機抽 2~9 各段口訣
+            const a = Math.floor(Math.random() * 8) + 2; // 2 ~ 9
+            const b = Math.floor(Math.random() * 8) + 2; // 2 ~ 9
+            formula = `${a} × ${b} ＝ ？`;
+            ans = a * b;
+            explanation = `九九乘法口訣：${a} 乘 ${b} 等於 ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>背誦乘法口訣「${a}」的那一行口訣！`;
+          } else if (type === 1) {
+            // 整十加法
+            const a = (Math.floor(Math.random() * 5) + 1) * 10;
+            const b = (Math.floor(Math.random() * 4) + 1) * 10;
+            formula = `${a} ＋ ${b} ＝ ？`;
+            ans = a + b;
+            explanation = `整十相加：${a/10} 個十加 ${b/10} 個十等於 ${ans/10} 個十 (${ans})`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>十位相加，個位補 0！`;
+          } else if (type === 2) {
+            // 二位數不進位加法
+            const a = Math.floor(Math.random() * 30) + 21;
+            const b = Math.floor(Math.random() * 20) + 12;
+            formula = `${a} ＋ ${b} ＝ ？`;
+            ans = a + b;
+            explanation = `直式加法：個位對齊加個位，十位加十位得到 ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>個位加個位、十位加十位！`;
+          } else {
+            // 乘法填空題
+            const a = Math.floor(Math.random() * 7) + 3; // 3 ~ 9
+            const b = Math.floor(Math.random() * 7) + 3;
+            const prod = a * b;
+            formula = `${a} × ( ? ) ＝ ${prod}`;
+            ans = b;
+            explanation = `想一想乘法口訣：${a} 乘以 ${ans} 剛好等於 ${prod}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>背「${a}」的乘法表，看幾倍剛好是 ${prod}！`;
+          }
         } else if (isStage2) {
-          const a = Math.floor(Math.random() * 30) + 25;
-          const b = Math.floor(Math.random() * 25) + 18;
-          formula = `${a} ＋ ${b} ＝ ？`;
-          ans = a + b;
-          explanation = `進位加法：個位滿十進位到十位，答案為 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>個位數相加超過 10，記得進位 1 到十位數！`;
+          const type = Math.floor(Math.random() * 4);
+          if (type === 0) {
+            // 二位數進位加法
+            const a = Math.floor(Math.random() * 35) + 27;
+            const b = Math.floor(Math.random() * 25) + 18;
+            formula = `${a} ＋ ${b} ＝ ？`;
+            ans = a + b;
+            explanation = `進位加法：個位相加超過十，向十位進 1，答案是 ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>個位滿十記得進位 1 到十位！`;
+          } else if (type === 1) {
+            // 不退位減法
+            const a = Math.floor(Math.random() * 35) + 55;
+            const b = Math.floor(Math.random() * 20) + 11;
+            formula = `${a} － ${b} ＝ ？`;
+            ans = a - b;
+            explanation = `二位數直式減法：個位相減、十位相減得到 ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>個位減個位、十位減十位！`;
+          } else if (type === 2) {
+            // 乘法填空被乘數
+            const a = Math.floor(Math.random() * 6) + 3;
+            const b = Math.floor(Math.random() * 6) + 4;
+            const prod = a * b;
+            formula = `( ? ) × ${b} ＝ ${prod}`;
+            ans = a;
+            explanation = `乘法逆運算：${prod} ÷ ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>想一想什麼數字乘上 ${b} 會等於 ${prod}？`;
+          } else {
+            // 三數連加
+            const a = Math.floor(Math.random() * 15) + 12;
+            const b = Math.floor(Math.random() * 15) + 10;
+            const c = Math.floor(Math.random() * 8) + 5;
+            formula = `${a} ＋ ${b} ＋ ${c} ＝ ？`;
+            ans = a + b + c;
+            explanation = `連加計算：${a} ＋ ${b} ＝ ${a+b}，再加 ${c} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>由左到右一步一步加起來！`;
+          }
         } else {
-          const a = Math.floor(Math.random() * 30) + 52;
-          const b = Math.floor(Math.random() * 20) + 18;
-          formula = `${a} － ${b} ＝ ？`;
-          ans = a - b;
-          explanation = `退位減法：個位不夠減向十位借 1 當 10，答案為 ${ans}`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>個位不夠減時，向十位借 1 顆十來減！`;
+          const type = Math.floor(Math.random() * 3);
+          if (type === 0) {
+            // 退位減法
+            const a = Math.floor(Math.random() * 30) + 51;
+            const b = Math.floor(Math.random() * 20) + 18;
+            formula = `${a} － ${b} ＝ ？`;
+            ans = a - b;
+            explanation = `退位減法：個位不夠減向十位借 1 當 10，答案為 ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>個位不夠減時，記得向十位借 1 顆十來減！`;
+          } else if (type === 1) {
+            // 生活找零錢
+            const cost = Math.floor(Math.random() * 35) + 25;
+            formula = `小智拿 100 元買 ${cost} 元的精靈球，找回多少元？`;
+            ans = 100 - cost;
+            explanation = `找錢計算：100 － ${cost} ＝ ${ans} 元`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>用 100 元減掉買東西花掉的 ${cost} 元！`;
+          } else {
+            // 九九乘法大數段
+            const a = Math.floor(Math.random() * 3) + 7; // 7, 8, 9
+            const b = Math.floor(Math.random() * 3) + 7;
+            formula = `${a} × ${b} ＝ ？`;
+            ans = a * b;
+            explanation = `高階乘法口訣：${a} × ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>背誦乘法表「${a}」的大數字口訣！`;
+          }
         }
-      } else {
+      } else { // 下學期：長度公尺公分雙向換算、均分除法、時間經過、三位數加減
         if (isStage1) {
-          const m = Math.floor(Math.random() * 4) + 2;
-          const cm = Math.floor(Math.random() * 70) + 15;
-          formula = `${m} 公尺 ${cm} 公分 ＝ 多少公分？`;
-          ans = m * 100 + cm;
-          explanation = `1 公尺 ＝ 100 公分，${m} 公尺 ＝ ${m*100} 公分，再加上 ${cm} 公分 ＝ ${ans} 公分`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${m} 公尺 ＝ ${m*100} 公分，再加上後面的 ${cm} 公分！`;
+          const type = Math.floor(Math.random() * 4);
+          if (type === 0) {
+            const m = Math.floor(Math.random() * 6) + 2; // 2 ~ 7公尺
+            const cm = Math.floor(Math.random() * 75) + 15;
+            formula = `${m} 公尺 ${cm} 公分 ＝ 多少公分？`;
+            ans = m * 100 + cm;
+            explanation = `1 公尺 ＝ 100 公分，${m} 公尺 ＝ ${m*100} 公分，加上 ${cm} 公分 ＝ ${ans} 公分`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>先算 ${m} 公尺是 ${m*100} 公分，再加 ${cm}！`;
+          } else if (type === 1) {
+            const m = Math.floor(Math.random() * 5) + 3;
+            const cm = Math.floor(Math.random() * 60) + 10;
+            const total = m * 100 + cm;
+            formula = `${total} 公分 ＝ ( ? ) 公尺 ${cm} 公分`;
+            ans = m;
+            explanation = `每 100 公分等於 1 公尺，${total} 公分裡面有 ${m} 個 100 公分`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>百位數的數字就是有幾公尺！`;
+          } else if (type === 2) {
+            const a = Math.floor(Math.random() * 250) + 120;
+            const b = Math.floor(Math.random() * 200) + 110;
+            formula = `${a} ＋ ${b} ＝ ？`;
+            ans = a + b;
+            explanation = `三位數直式加法：${a} ＋ ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>個位、十位、百位對齊相加！`;
+          } else {
+            const m1 = Math.floor(Math.random() * 3) + 2;
+            const m2 = Math.floor(Math.random() * 2) + 1;
+            formula = `${m1} 公尺 ＋ ${m2} 公尺 ＝ 多少公分？`;
+            ans = (m1 + m2) * 100;
+            explanation = `${m1} ＋ ${m2} ＝ ${m1+m2} 公尺，換算成公分為 ${ans} 公分`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>先相加有幾公尺，再乘上 100 換成公分！`;
+          }
         } else if (isStage2) {
-          const count = (Math.floor(Math.random() * 5) + 3) * 4;
-          formula = `${count} 顆樹果，每 4 顆裝一盒，可以裝幾盒？`;
-          ans = count / 4;
-          explanation = `平均分裝：${count} ÷ 4 ＝ ${ans} 盒`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>想一想 4 乘以多少會剛好是 ${count}？`;
+          const type = Math.floor(Math.random() * 4);
+          if (type === 0) {
+            const perBox = [3, 4, 5, 6][Math.floor(Math.random() * 4)];
+            const boxCount = Math.floor(Math.random() * 5) + 3;
+            const total = perBox * boxCount;
+            formula = `${total} 顆樹果，每 ${perBox} 顆裝一盒，可以裝幾盒？`;
+            ans = boxCount;
+            explanation = `均分裝盒：${total} ÷ ${perBox} ＝ ${ans} 盒`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>想一想 ${perBox} 乘以多少會等於 ${total}？`;
+          } else if (type === 1) {
+            const h = Math.floor(Math.random() * 3) + 2;
+            const m = [15, 30, 45][Math.floor(Math.random() * 3)];
+            formula = `上午 9 點 ${m} 分，再過 ${h} 小時是上午幾點 ${m} 分？`;
+            ans = 9 + h;
+            explanation = `時間推算：時針加 ${h} 小時，9 ＋ ${h} ＝ ${ans} 點`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>只要把小時相加，分鐘保持不變！`;
+          } else if (type === 2) {
+            const a = Math.floor(Math.random() * 300) + 450;
+            const b = Math.floor(Math.random() * 200) + 120;
+            formula = `${a} － ${b} ＝ ？`;
+            ans = a - b;
+            explanation = `三位數直式減法：${a} － ${b} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>三位數直式相減！`;
+          } else {
+            const len1 = Math.floor(Math.random() * 200) + 300;
+            const len2 = Math.floor(Math.random() * 100) + 50;
+            formula = `紅繩長 ${len1}cm，藍繩長 ${len2}cm，兩條共長幾公分？`;
+            ans = len1 + len2;
+            explanation = `長度相加：${len1} ＋ ${len2} ＝ ${ans} 公分`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>把兩條繩子的長度加起來！`;
+          }
         } else {
-          const total = (Math.floor(Math.random() * 4) + 3) * 5;
-          formula = `${total} 顆神奇糖果，平分給 5 隻寶可夢，每隻分幾顆？`;
-          ans = total / 5;
-          explanation = `平分計算：${total} ÷ 5 ＝ ${ans} 顆`;
-          hintGuide = `💡 <b>皮卡丘引導：</b>想一想 5 乘以幾等於 ${total}！`;
+          const type = Math.floor(Math.random() * 3);
+          if (type === 0) {
+            const friends = [3, 4, 5, 6][Math.floor(Math.random() * 4)];
+            const each = Math.floor(Math.random() * 4) + 4;
+            const total = friends * each;
+            formula = `${total} 顆糖果平分給 ${friends} 隻寶可夢，每隻分得幾顆？`;
+            ans = each;
+            explanation = `平分計算：${total} ÷ ${friends} ＝ ${ans} 顆`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>背「${friends}」的乘法口訣，看幾倍是 ${total}！`;
+          } else if (type === 1) {
+            const totalM = Math.floor(Math.random() * 4) + 5;
+            const cutCm = Math.floor(Math.random() * 200) + 100;
+            formula = `${totalM} 公尺的緞帶用去 ${cutCm} 公分，還剩下幾公分？`;
+            ans = totalM * 100 - cutCm;
+            explanation = `${totalM} 公尺 ＝ ${totalM*100} 公分，${totalM*100} － ${cutCm} ＝ ${ans} 公分`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>先換成 ${totalM*100} 公分，再減去 ${cutCm} 公分！`;
+          } else {
+            const a = Math.floor(Math.random() * 200) + 150;
+            const b = Math.floor(Math.random() * 150) + 100;
+            const c = Math.floor(Math.random() * 80) + 30;
+            formula = `${a} ＋ ${b} － ${c} ＝ ？`;
+            ans = a + b - c;
+            explanation = `加減混合計算：${a} ＋ ${b} ＝ ${a+b}，再減 ${c} ＝ ${ans}`;
+            hintGuide = `💡 <b>皮卡丘引導：</b>先算前面的加法，再算後面的減法！`;
+          }
         }
       }
-    } else if (grade === 3) {
+    }
+
+    // =========================================================================
+    // 三年級 (Grade 3)
+    // =========================================================================
+    else if (grade === 3) {
       if (region === "kanto") {
         if (isStage1) {
           const den = [5, 6, 7, 8, 9][Math.floor(Math.random() * 5)];
@@ -2149,7 +2296,12 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>1 公斤 ＝ 1000 公克！`;
         }
       }
-    } else if (grade === 4) {
+    }
+
+    // =========================================================================
+    // 四年級 (Grade 4)
+    // =========================================================================
+    else if (grade === 4) {
       if (region === "kanto") {
         if (isStage1) {
           const a = (Math.floor(Math.random() * 30) + 10) / 100;
@@ -2190,7 +2342,12 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>三角形內角總和是 180 度！`;
         }
       }
-    } else if (grade === 5) {
+    }
+
+    // =========================================================================
+    // 五年級 (Grade 5)
+    // =========================================================================
+    else if (grade === 5) {
       if (region === "kanto") {
         if (isStage1) {
           const a = (Math.floor(Math.random() * 3) + 2) * 2;
@@ -2230,7 +2387,12 @@
           hintGuide = `💡 <b>皮卡丘引導：</b>打八折代表乘以 0.8！`;
         }
       }
-    } else {
+    }
+
+    // =========================================================================
+    // 六年級 (Grade 6)
+    // =========================================================================
+    else {
       if (region === "kanto") {
         if (isStage1) {
           const a = (Math.floor(Math.random() * 3) + 2) * 2;
@@ -2295,7 +2457,7 @@
     };
   }
 
-  /* ================= 抓寶系統邏輯 (90% 判定 & 失敗動畫) ================= */
+  /* ================= 抓寶系統邏輯 ================= */
   function triggerCatchPhase(isCatchSuccess) {
     if (isCatchSuccess) playCatchSE();
     else playCatchFailSE();
@@ -2339,7 +2501,7 @@
   function finishCatchModal() {
     document.getElementById("catch-overlay").style.display = "none";
     document.getElementById("end-modal").style.display = "flex";
-    renderStartersList(); // 即時重新渲染選角清單，魔王立即解鎖可用
+    renderStartersList();
   }
 
   /* ================= 爆擊動態金幣特效 ================= */
@@ -2407,7 +2569,7 @@
 
     const all = getAllStarters(currentGrade);
     const starter = all[currentStarterKey] || all.ceruledge;
-    totalStageQuestions = starter.totalQuestions; // 使用神獸魔王時為 10 題
+    totalStageQuestions = starter.totalQuestions;
 
     document.getElementById("branch-overlay").style.display = "none";
     document.getElementById("menu-screen").style.display = "none";
@@ -2448,8 +2610,9 @@
   }
 
   function nextQuestion() {
-    if (currentQuestionCount >= totalStageQuestions || oppHp <= 0 || playerHp <= 0) {
-      endBattle(oppHp <= 0 || correctCount >= Math.ceil(totalStageQuestions * 0.7));
+    // 嚴格保證：必須完整做完規定題數才結算，絕不提前中斷
+    if (currentQuestionCount >= totalStageQuestions || playerHp <= 0) {
+      endBattle(correctCount >= Math.ceil(totalStageQuestions * 0.7));
       return;
     }
 
@@ -2545,17 +2708,22 @@
       spell.innerText = isCrit ? "⚡💥🌟" : currentStageData.spell;
       spell.classList.add("active");
 
-      // 傷害計算：一般角色不因連擊爆擊倍增傷害，只有選用神獸魔王出戰時享有 2 倍攻擊力
-      let baseDamage = Math.ceil((100 / totalStageQuestions) * 1.05);
-      if (starter.isBoss) baseDamage *= 2; 
-      if (isHintActiveForCurrentQ) baseDamage = Math.ceil(baseDamage * 1.15);
-      const totalDamage = Math.ceil(baseDamage * multiplier);
+      // 扣血平衡與 1 HP 鎖血機制
+      let rawDamage = (100 / totalStageQuestions);
+      if (starter.isBoss) rawDamage *= 1.5; 
+      let totalDamage = Math.ceil(rawDamage);
 
       setTimeout(() => {
         oppImg.classList.add("shake", "blink");
         oppHud.classList.add("shake");
         if (isCrit || currentStreak >= 3) spawnCoinBurst();
-        oppHp -= totalDamage;
+
+        // 鎖血保護：未達最後一題前，魔王至少保留 1 HP
+        if (currentQuestionCount < totalStageQuestions) {
+          oppHp = Math.max(1, oppHp - totalDamage);
+        } else {
+          oppHp = 0;
+        }
         updateHpUI();
       }, 250);
 
@@ -2708,7 +2876,7 @@
     }, 3600);
   }
 
-  /* ================= 結算彈窗與成績登錄 (90% 捕獲判定) ================= */
+  /* ================= 結算彈窗與成績登錄 ================= */
   function endBattle(isWin) {
     const timeUsed = Math.max(1, Math.floor((Date.now() - startTime) / 1000));
     const accuracy = Math.round((correctCount / totalStageQuestions) * 100);
@@ -2750,7 +2918,7 @@
       });
     }
 
-    // 勝利或通關時，進入捕獲判定（90% 成功，低於 90% 失敗）
+    // 正確率達 90% 捕獲判定
     if (isWin) {
       const isSuccess = accuracy >= 90;
       setTimeout(() => triggerCatchPhase(isSuccess), 400);
