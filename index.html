@@ -2717,13 +2717,16 @@
 
         if (stageId === "kanto_1") { // 翰林：比、比值、比例
           if (isBasic) {
-            const g = pick([2,3,4,5]), x = Math.floor(Math.random()*5)+2, y=x*g;
-            formula = `${x}：${y} 化成最簡整數比是多少？`;
-            ans = `${x/g}：${y/g}`;
-            // 答案字串需要特殊選項處理，後面統一以數值不適用，因此改為詢問前項
-            formula = `${x}：${y} 化成最簡整數比後，前項是多少？`; ans=x/g;
-            explanation=`兩項同除以 ${g}，前項為 ${ans}`;
-            hintGuide=`💡 <b>皮卡丘引導：</b>比的兩項要同除以最大公因數。`;
+            // 先建立「已約分的最簡比」(p:q)，再同乘公因數 g，
+            // 確保題目中的原始比一定能正確化成 p:q。
+            const coprimePairs = [[1,2],[1,3],[1,4],[2,3],[2,5],[3,4],[3,5],[4,5]];
+            const [p,q] = pick(coprimePairs);
+            const g = pick([2,3,4,5,6]);
+            const x = p*g, y = q*g;
+            formula = `${x}：${y} 化成最簡整數比後，前項是多少？`;
+            ans = p;
+            explanation=`${x}：${y} 兩項同除以 ${g}，得到 ${p}：${q}，所以前項是 ${ans}`;
+            hintGuide=`💡 <b>皮卡丘引導：</b>先找兩數的最大公因數，再把比的兩項同除以它。`;
           } else if (isMid) {
             const a=pick([2,3,4,5]), b=pick([3,4,5,6]), k=pick([2,3,4]);
             const x=a*k;
@@ -2733,10 +2736,15 @@
             const bags=a, items=b, known=x; formula=`${bags} 袋有 ${known} 顆樹果，照相同比例 ${b} 袋有幾顆？`; ans=round(known*b/bags); explanation=`每袋 ${known}÷${bags}＝${known/bags} 顆，再乘 ${b} 袋＝${ans} 顆`;
             hintGuide=`💡 <b>皮卡丘引導：</b>先求每一袋，再乘上袋數。`;
           } else {
-            const total=pick([48,60,72,84,96]), ratio=pick([2,3,4]), other=pick([3,4,5]);
-            const first=total*ratio/(ratio+other);
+            // 確保總數可以被「總份數」整除，答案一定是完整的顆數。
+            const ratioOptions = [[2,3],[2,5],[3,4],[3,5],[4,5]];
+            const [ratio,other] = pick(ratioOptions);
+            const parts = ratio + other;
+            const one = pick([6,8,10,12,15]);
+            const total = parts * one;
+            const first = one * ratio;
             formula=`${npc} 有 ${total} 顆糖果，甲乙數量比為 ${ratio}：${other}，甲有幾顆？`; ans=first;
-            explanation=`總份數 ${ratio+other} 份，${total}÷${ratio+other}＝${total/(ratio+other)}，甲＝${total/(ratio+other)}×${ratio}＝${ans}`;
+            explanation=`總份數 ${parts} 份，1份 ${one} 顆，甲＝${one}×${ratio}＝${ans}`;
             hintGuide=`💡 <b>皮卡丘引導：</b>先算 1 份，再乘甲所占的份數。`;
           }
         } else if (stageId === "kanto_2") { // 南一：圓
@@ -2752,7 +2760,16 @@
           const type=Math.floor(Math.random()*3);
           if (type===0) { const r=pick([4,5,6]); formula=`半徑 ${r} cm 的圓，圓周長是多少？（π＝3.14）`; ans=round(2*r*3.14); explanation=`2×${r}×3.14＝${ans} cm`; hintGuide=`💡 <b>皮卡丘引導：</b>直徑×π。`; }
           else if (type===1) { const a=pick([3,4,5]), d=pick([2,3,4]); formula=`${a} ÷ 1/${d} ＝ ？`; ans=a*d; explanation=`${a}×${d}＝${ans}`; hintGuide=`💡 <b>皮卡丘引導：</b>除以分數就是乘倒數。`; }
-          else { const total=pick([36,48,60,72]), p=pick([2,3]), q=pick([3,4]); const one=total/(p+q); ans=one*p; formula=`${total} 顆樹果依 ${p}：${q} 分給兩隊，第一隊得到幾顆？`; explanation=`總份數 ${p+q}，1份 ${one} 顆，第一隊 ${one}×${p}＝${ans}`; hintGuide=`💡 <b>皮卡丘引導：</b>先求 1 份。`; }
+          else {
+            const ratioOptions = [[2,3],[2,5],[3,4],[3,5],[4,5]];
+            const [p,q] = pick(ratioOptions);
+            const one = pick([6,8,10,12,15]);
+            const total = (p+q)*one;
+            ans=one*p;
+            formula=`${total} 顆樹果依 ${p}：${q} 分給兩隊，第一隊得到幾顆？`;
+            explanation=`總份數 ${p+q}，1份 ${one} 顆，第一隊 ${one}×${p}＝${ans}`;
+            hintGuide=`💡 <b>皮卡丘引導：</b>先求 1 份，再乘第一隊所占的份數。`;
+          }
         } else if (stageId === "kalos_1") { // 翰林：方程式
           const a=isBasic?pick([2,3,4]):pick([3,4,5,6]); const x=pick([2,3,4,5,6]); const b=pick([3,5,7,9]);
           formula=`${a}x ＋ ${b} ＝ ${a*x+b}，求 x。`; ans=x; explanation=`先減 ${b}：${a}x＝${a*x}，再除以 ${a}，x＝${ans}`; hintGuide=`💡 <b>皮卡丘引導：</b>先把常數移到等號另一邊，再除以 x 前面的數。`;
