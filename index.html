@@ -509,6 +509,11 @@
     .stage-info { flex: 1; min-width: 0; }
     .stage-info h3 { font-size: clamp(11.5px, 1.7vh, 14.5px); color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 900; }
     .stage-info p { font-size: clamp(9.5px, 1.35vh, 11.5px); color: #64748b; font-weight: bold; margin-top: 2px; line-height: 1.3; word-break: break-word; }
+    .version-line{display:flex;align-items:center;gap:5px;flex-wrap:wrap;line-height:1.2;}
+    .version-badge{display:inline-block;color:#fff;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:900;white-space:nowrap;}
+    .version-hanlin{background:#ef4444}.version-nan1{background:#2563eb}.version-kang{background:#8b5cf6}.version-combo{background:#f59e0b;color:#111827}
+    .version-units{color:#64748b;font-size:10px;font-weight:700;}
+
 
     .rank-table {
       width: 100%;
@@ -1370,10 +1375,10 @@
 
     <div class="map-regions-grid">
       <div class="region-map-card" onclick="selectRegion('kalos')">
-        <div class="region-badge">🏯 卡洛斯地區大賽</div>
+        <div class="region-badge">📘 下學期教材版本大賽</div>
         <div class="region-title">小學【下學期】挑戰</div>
         <div class="region-math-badge">下學期精選核心單元</div>
-        <div class="region-desc">依年級自動配對下學期單元<br>道館守領：哲爾尼亞斯、伊裴爾塔爾、波爾凱尼恩、冰岩怪</div>
+        <div class="region-desc">同一學期分成：翰林、南一、康軒、三版本綜合<br>四隻 Boss 分別代表四套題庫</div>
         <div class="region-boss-preview">
           <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/716.png" alt="哲爾尼亞斯" />
           <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/717.png" alt="伊裴爾塔爾" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/717.png'" />
@@ -1383,10 +1388,10 @@
       </div>
 
       <div class="region-map-card" onclick="selectRegion('kanto')">
-        <div class="region-badge">⚡ 關東地區大賽</div>
+        <div class="region-badge">📗 上學期教材版本大賽</div>
         <div class="region-title">小學【上學期】挑戰</div>
         <div class="region-math-badge">上學期精選核心單元</div>
-        <div class="region-desc">依年級自動配對上學期單元<br>道館守領：快龍、卡比獸、超夢、火焰鳥</div>
+        <div class="region-desc">同一學期分成：翰林、南一、康軒、三版本綜合<br>四隻 Boss 分別代表四套題庫</div>
         <div class="region-boss-preview">
           <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png" alt="快龍" />
           <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png" alt="卡比獸" />
@@ -1816,105 +1821,115 @@
     return combined;
   }
 
-  /* ================= 依年級動態生成道館資料（依需求移除所有等級標籤字樣，詳細列出題型） ================= */
-  function getStagesByGrade(grade, regionKey) {
-    const sem = regionKey === "kanto" ? "上學期" : "下學期";
-    const TOPIC_DETAILS = {
-      2: {
-        kanto: [
-          "九九乘法表、乘法口訣、乘法倍數計算",
-          "二位數直式加法、二位數進位加法、整十加法",
-          "二位數退位減法、借位運算、生活減法應用",
-          "乘法與加減混合、整十乘法、買東西找錢計算"
-        ],
-        kalos: [
-          "公尺與公分換算、公尺公分長度加減、長度測量",
-          "分裝除法概念、平分樹果除法、乘除法關係",
-          "鐘面時間判讀、幾點幾分經過時間、上午下午計算",
-          "生活長度綜合計算、三位數加減、生活計量應用"
-        ]
+  /* ================= 依年級＋學期＋教材版本建立道館 ================= */
+  const TEXTBOOK_META = {
+    2: {
+      hanlin: {
+        upper: "200以內的數、二位數的加減、乘法與乘法應用",
+        lower: "長度、分裝與平分、時間、三位數與生活應用"
       },
-      3: {
-        kanto: [
-          "三位數乘一位數、三位數直式加減、百位進位乘法",
-          "三位數除以一位數、除法直式計算、整除求商",
-          "千以內加減運算、乘除先算四則混合、三位數混合",
-          "同分母分數加法、同分母分數減法、一位小數加減法"
-        ],
-        kalos: [
-          "長方形面積公式、邊長乘邊長求長方形面積",
-          "正方形周長公式、正方形面積公式、周長逆推邊長",
-          "重量公斤與公克換算、公克加減、重量單位比較",
-          "長方形周長與面積綜合、正方形周長面積應用、生活幾何計算"
-        ]
+      nan1: {
+        upper: "數到300、加法與減法、乘法、生活應用",
+        lower: "數到1000、長度、時間、乘除與生活應用"
       },
-      4: {
-        kanto: [
-          "二位小數直式加法、二位小數直式減法、小數點對齊",
-          "假分數化為帶分數、帶分數化為假分數、分數轉換",
-          "億以內大數讀寫、萬與億大數加減、位值概念計算",
-          "二位小數加減混合、假分數帶分數運算、小數分數綜合"
-        ],
-        kalos: [
-          "括號先算四則混合、兩步驟先乘除後加減、整數混合",
-          "三角形求第三角、等腰三角形求底角頂角、四邊形求第四角",
-          "公里與公尺長度換算、小數乘以整數直式、長度小數運算",
-          "角度計算綜合、多步驟四則運算、複合圖形周長與幾何殿堂"
-        ]
-      },
-      5: {
-        kanto: [
-          "因數判定、倍數判定、短除法求最大公因數與最小公倍數",
-          "異分母分數通分加法、異分母分數減法、分數擴分",
-          "整數四則混合運算、括號多層先乘除後加減、分配律初步",
-          "三角形面積公式、平行四邊形面積、梯形面積公式"
-        ],
-        kalos: [
-          "分數乘以整數、分數乘以分數、分數約分運算",
-          "正方體體積公式、長方體體積公式、立方公分體積",
-          "公升與毫升容量換算、公升立方公分容積換算、容積容量",
-          "百分率化小數、定價折數計算、正長方體表面積與五下總決賽"
-        ]
-      },
-      6: {
-        kanto: [
-          "最簡整數比前項求解、比例式內外項相乘求未知數 x",
-          "圓周長計算、圓面積公式 (π=3.14)、圓幾何運算",
-          "分數除法倒數相乘、整數除以分數、小數除法運算",
-          "扇形弧長計算、扇形面積計算 (π=3.14)、圓環面積"
-        ],
-        kalos: [
-          "一元一次未知數移項求解、括號方程式、等量公理",
-          "速率相遇問題、速率追趕問題、時間速率距離公式",
-          "角柱體積表面積、圓柱體積與底圓面積乘高、柱體幾何",
-          "雞兔同籠假設法、年齡差與未知數問題、小學數學終極冠軍殿堂"
-        ]
+      kang: {
+        upper: "數到300、二位數加減、乘法、生活情境",
+        lower: "數到1000、長度、時間、乘除與生活應用"
       }
-    };
-
-    const descs = TOPIC_DETAILS[grade][regionKey];
-
-    if (regionKey === "kalos") {
-      return {
-        name: `🏯 卡洛斯地區 (${grade}年級${sem})`,
-        stages: [
-          { id: "kalos_1", name: "生命之樹", boss: "哲爾尼亞斯", bossType: "fairy", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/716.png", desc: descs[0], level: 35, diff: "easy", diffName: "" },
-          { id: "kalos_2", name: "破滅之翼", boss: "伊裴爾塔爾", bossType: "dark", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/717.png", desc: descs[1], level: 60, diff: "mid", diffName: "" },
-          { id: "kalos_3", name: "蒸汽火山口", boss: "波爾凱尼恩", bossType: "water", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/721.png", desc: descs[2], level: 80, diff: "hard", diffName: "" },
-          { id: "kalos_4", name: "極地冰峰", boss: "冰岩怪", bossType: "ice", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/713.png", desc: descs[3], level: 95, diff: "champ", diffName: "" }
-        ]
-      };
-    } else {
-      return {
-        name: `⚡ 關東地區 (${grade}年級${sem})`,
-        stages: [
-          { id: "kanto_1", name: "龍之神殿", boss: "快龍", bossType: "dragon", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png", desc: descs[0], level: 35, diff: "easy", diffName: "" },
-          { id: "kanto_2", name: "寧靜之森", boss: "卡比獸", bossType: "normal", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png", desc: descs[1], level: 60, diff: "mid", diffName: "" },
-          { id: "kanto_3", name: "精神領域", boss: "超夢", bossType: "psychic", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png", desc: descs[2], level: 80, diff: "hard", diffName: "" },
-          { id: "kanto_4", name: "烈焰火山", boss: "火焰鳥", bossType: "flying", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/146.png", desc: descs[3], level: 95, diff: "champ", diffName: "" }
-        ]
-      };
+    },
+    3: {
+      hanlin: {
+        upper: "數到10000、四位數加減、乘法與除法、分數",
+        lower: "分數、小數、長度重量、面積與周長"
+      },
+      nan1: {
+        upper: "數到10000、四位數加減、乘法與除法、分數",
+        lower: "分數、小數、時間、面積與重量"
+      },
+      kang: {
+        upper: "10000以內的數、四位數加減、乘除、分數",
+        lower: "面積、重量、時間、分數與小數"
+      }
+    },
+    4: {
+      hanlin: {
+        upper: "一億以內的數、乘法、角度、分數",
+        lower: "概數、四則運算、分數加減、小數、面積與體積"
+      },
+      nan1: {
+        upper: "一億以內的數、乘法、角度、除法、分數",
+        lower: "多位數乘除、四邊形、概數、小數、周長與面積"
+      },
+      kang: {
+        upper: "一億以內的數、整數乘法、角度、整數除法",
+        lower: "多位數乘除、四邊形、概數、小數、周長與面積"
+      }
+    },
+    5: {
+      hanlin: {
+        upper: "折線圖、倍數與因數、平面圖形、公倍數與公因數、立體形體",
+        lower: "數的十進位結構、分數計算、長方體與正方體體積、小數、時間、容積、比率與百分率、表面積"
+      },
+      nan1: {
+        upper: "折線圖、因數和倍數、多邊形、擴分約分通分、異分母分數、面積",
+        lower: "分數計算、十進位結構、小數乘法、體積、整數小數除法、比率百分率、容積"
+      },
+      kang: {
+        upper: "小數加減、因數與公因數、倍數與公倍數、通分、面積、整數四則",
+        lower: "體積、分數計算、容積、小數乘法、大數與折線圖、小數除法、比率百分率、時間"
+      }
+    },
+    6: {
+      hanlin: {
+        upper: "最大公因數與最小公倍數、分數除法、小數除法、比與比值",
+        lower: "小數與分數的四則運算、角柱與圓柱、速率、圓形圖、基準量與比較量、怎樣解題"
+      },
+      nan1: {
+        upper: "質因數分解和短除法、分數的除法、小數的除法、圓周率和圓面積、比和比值",
+        lower: "四則混合運算、圓形圖、基準量和比較量、放大圖縮圖與比例尺、怎樣解題、柱體體積與表面積"
+      },
+      kang: {
+        upper: "最大公因數與最小公倍數、分數除法、數量關係、小數除法、比與比值",
+        lower: "小數與分數的計算、速率的應用、柱體體積與表面積、基準量與比較量、怎樣解題、圓形圖"
+      }
     }
+  };
+
+  function getStagesByGrade(grade, regionKey) {
+    const isUpper = regionKey === "kanto";
+    const semesterKey = isUpper ? "upper" : "lower";
+    const semesterName = isUpper ? "上學期" : "下學期";
+    const bossInfo = [
+      { versionKey: "hanlin", versionName: "翰林版", boss: "快龍", bossType: "dragon", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png", color: "#ef4444" },
+      { versionKey: "nan1", versionName: "南一版", boss: "卡比獸", bossType: "normal", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png", color: "#2563eb" },
+      { versionKey: "kang", versionName: "康軒版", boss: "超夢", bossType: "psychic", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png", color: "#8b5cf6" },
+      { versionKey: "combo", versionName: "三版本綜合", boss: "火焰鳥", bossType: "flying", bossImg: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/146.png", color: "#f59e0b" }
+    ];
+
+    const stages = bossInfo.map((b, i) => {
+      const topic = b.versionKey === "combo"
+        ? `翰林＋南一＋康軒綜合題`
+        : TEXTBOOK_META[grade][b.versionKey][semesterKey];
+      return {
+        id: `${regionKey}_${i + 1}`,
+        name: ["翰林版挑戰", "南一版挑戰", "康軒版挑戰", "三版本綜合挑戰"][i],
+        boss: b.boss,
+        bossType: b.bossType,
+        bossImg: b.bossImg,
+        versionKey: b.versionKey,
+        versionName: b.versionName,
+        desc: topic,
+        level: [35, 60, 80, 95][i],
+        diff: ["easy", "mid", "hard", "champ"][i],
+        diffName: ""
+      };
+    });
+
+    return {
+      name: `📚 ${grade}年級｜${semesterName}教材版本道館`,
+      semesterName,
+      stages
+    };
   }
 
   /* ================= 狀態變數 ================= */
@@ -2002,6 +2017,7 @@
       startBGM();
     } catch (e) {}
     currentGrade = grade;
+    usedProblemSignatures.clear();
     const titleElem = document.getElementById("map-header-title");
     if (titleElem) titleElem.innerText = `🗺️ 國小 ${grade} 年級 - 寶可夢數學大冒險 🗺️`;
     goToWorldMap();
@@ -2035,7 +2051,7 @@
     document.getElementById("header-map-btn").style.display = "inline-block";
     document.getElementById("header-back-btn").style.display = "none";
 
-    document.getElementById("gym-menu-title").innerText = `⚔️ ${currentGrade}年級【${semTxt}】挑戰道館 ⚔️`;
+    document.getElementById("gym-menu-title").innerText = `⚔️ ${currentGrade}年級【${semTxt}】｜翰林・南一・康軒・綜合題庫 ⚔️`;
 
     renderStartersList();
     renderGymStages();
@@ -2105,174 +2121,194 @@
       const card = document.createElement("div");
       card.className = "stage-card";
       card.onclick = () => startBattle(stg);
+      const vkClass = stg.versionKey === "hanlin" ? "version-hanlin" : stg.versionKey === "nan1" ? "version-nan1" : stg.versionKey === "kang" ? "version-kang" : "version-combo";
+      const unitsHtml = stg.versionKey === "combo" ? "" : `<span class="version-units">${stg.desc}</span>`;
       card.innerHTML = `
-        <img class="stage-icon" src="${stg.bossImg}" alt="${stg.boss}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${stg.bossType === 'dark' ? '717' : '25'}.png'" />
+        <img class="stage-icon" src="${stg.bossImg}" alt="${stg.boss}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'" />
         <div class="stage-info">
           <h3>${stg.name}（守護：${stg.boss}）</h3>
-          <p style="color:#94a3b8; font-size:11px; margin-top:3px; font-weight:normal;">${stg.desc}</p>
+          <div class="version-line">
+            <span class="version-badge ${vkClass}">${stg.versionName}</span>${unitsHtml}
+          </div>
         </div>
       `;
       container.appendChild(card);
     });
   }
 
-  /* ================= 核心題庫引擎：嚴格依據關卡 ID 出題，100% 吻合單元 ================= */
+  /* ================= 核心題庫引擎：版本分流＋可驗證＋不重複 ================= */
   let usedProblemSignatures = new Set();
 
-  function generateMathProblemNoDup(grade, region, stageId, qIndex, totalQ) {
-    let problem = null;
-    let attempts = 0;
+  function gcd(a, b) {
+    a = Math.abs(Math.trunc(a)); b = Math.abs(Math.trunc(b));
+    while (b) { const t = a % b; a = b; b = t; }
+    return a || 1;
+  }
+  function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+  function safeRound(x, digits = 2) { const p = 10 ** digits; return Math.round((x + Number.EPSILON) * p) / p; }
+  function qsig(formula, ans) { return `${String(formula).replace(/\s+/g, "")}|${String(ans)}`; }
 
-    while (attempts < 100) {
-      attempts++;
-      problem = createMathProblemRaw(grade, region, stageId, qIndex, totalQ);
-      const signature = `${problem.formula}_${problem.ans}`;
-      if (!usedProblemSignatures.has(signature)) {
-        usedProblemSignatures.add(signature);
-        break;
+  function generateMathProblemNoDup(grade, region, stageId, qIndex, totalQ) {
+    const stageNo = Number(stageId.split("_").pop());
+    const versionKey = stageNo === 1 ? "hanlin" : stageNo === 2 ? "nan1" : stageNo === 3 ? "kang" : "combo";
+    for (let attempt = 0; attempt < 500; attempt++) {
+      const p = createMathProblemRaw(grade, region, stageId, qIndex + attempt * 17, totalQ, versionKey);
+      if (!p || !p.formula || !Array.isArray(p.options)) continue;
+      const sig = qsig(p.formula, p.ans);
+      if (Number.isFinite(Number(p.ans)) && !usedProblemSignatures.has(sig) && validateQuestionObject(p)) {
+        usedProblemSignatures.add(sig);
+        return p;
       }
     }
-    return problem;
+    throw new Error(`題庫產生失敗：${grade}/${region}/${stageId}/${qIndex}`);
   }
 
-  function createMathProblemRaw(grade, region, stageId, qIndex, totalQ) {
-    let formula = "", ans = 0, explanation = "", hintGuide = "";
-    const seed = (typeof gradeQuestionSeed === "number" ? gradeQuestionSeed : 0);
-    const n = qIndex + (seed % 30);
-    const tier = totalQ === 30 ? (n <= 10 ? 1 : n <= 20 ? 2 : 3) : (n <= 6 ? 1 : n <= 13 ? 2 : 3);
-    const clamp = (x) => Math.max(1, Math.round(x));
+  function validateQuestionObject(p) {
+    if (!p || typeof p.formula !== "string" || !p.formula.trim()) return false;
+    if (!Number.isFinite(Number(p.ans))) return false;
+    if (!Array.isArray(p.options) || p.options.length !== 4) return false;
+    const vals = p.options.map(Number);
+    if (vals.some(v => !Number.isFinite(v))) return false;
+    const uniq = new Set(vals.map(v => safeRound(v, 8)));
+    if (uniq.size !== 4) return false;
+    return vals.some(v => Math.abs(v - Number(p.ans)) < 1e-8);
+  }
 
-    // =========================== 2年級：以數字與數學符號為主 ===========================
-    if (grade === 2) {
-      if (region === "kanto") {
-        if (stageId === "kanto_1") {
-          const a = 2 + ((n + 1) % 8), b = 2 + ((n * 3 + 1) % 8), c = Math.floor((n - 1) / 8);
-          formula = `${a} × ${b} ＋ ${c} ＝ ？`; ans = a * b + c;
-          explanation = `${a} × ${b} ＝ ${ans}`; hintGuide = `💡 先想 ${a} 的乘法口訣。`;
-        } else if (stageId === "kanto_2") {
-          const a = 24 + ((n * 7) % 55), b = 13 + ((n * 5) % 36);
-          formula = `${a} ＋ ${b} ＝ ？`; ans = a + b;
-          explanation = `${a} ＋ ${b} ＝ ${ans}`; hintGuide = `💡 個位先算，再算十位。`;
-        } else if (stageId === "kanto_3") {
-          const a = 55 + ((n * 9) % 45), b = 12 + ((n * 4) % 35); const aa = Math.max(a,b+10);
-          formula = `${aa} － ${b} ＝ ？`; ans = aa - b;
-          explanation = `${aa} － ${b} ＝ ${ans}`; hintGuide = `💡 不夠減時，記得向十位借 1。`;
-        } else {
-          const a = 2 + ((n * 2) % 7), b = 3 + ((n * 3) % 6), c = 4 + (n % 6);
-          formula = `${a} × ${b} ＋ ${c} ＝ ？`; ans = a*b+c;
-          explanation = `先算 ${a} × ${b}，再加 ${c}，答案 ${ans}`; hintGuide = `💡 先乘，再加。`;
-        }
-      } else {
-        if (stageId === "kalos_1") {
-          const m = 1 + (n % 6), cm = 10 + ((n * 11) % 90);
-          formula = `${m}m ＋ ${cm}cm ＝ ？cm`; ans = m*100+cm;
-          explanation = `${m}m＝${m*100}cm，${m*100}+${cm}＝${ans}cm`; hintGuide = `💡 1m＝100cm。`;
-        } else if (stageId === "kalos_2") {
-          const d = 2 + (n % 7), q = 3 + n, total = d*q;
-          formula = `${total} ÷ ${d} ＝ ？`; ans = q;
-          explanation = `${total} ÷ ${d} ＝ ${ans}`; hintGuide = `💡 想想 ${d} × 幾等於 ${total}。`;
-        } else if (stageId === "kalos_3") {
-          const h = 1 + (n % 9), m = (n * 7) % 60;
-          const startMin = 8*60 + 10, endMin = startMin + h*60 + m;
-          const hh = Math.floor(endMin/60), mm = endMin%60;
-          formula = `08:10 ＋ ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} ＝ ？ min`;
-          ans = endMin; explanation = `08:10 加上經過時間後為 ${hh}:${String(mm).padStart(2,'0')}，從00:00起共 ${endMin} 分`; hintGuide = `💡 先把時間換成分鐘再計算。`;
-        } else {
-          const a = 120 + ((n*17)%780), b = 30 + ((n*13)%70);
-          formula = `${a} － ${b} ＝ ？`; ans = a-b;
-          explanation = `${a}－${b}＝${ans}`; hintGuide = `💡 用位值對齊再相減。`;
-        }
-      }
-    }
-
-    // =========================== 3年級 ===========================
-    else if (grade === 3) {
-      if (region === "kanto") {
-        if (stageId === "kanto_1") {
-          const a = 120 + ((n*37)%380), b = 2 + (n%8); formula=`${a} × ${b} ＝ ？`; ans=a*b;
-          explanation=`${a}×${b}＝${ans}`; hintGuide=`💡 由個位開始依序乘。`;
-        } else if (stageId === "kanto_2") {
-          const d=2+(n%8), q=25+((n*13)%75); formula=`${d*q} ÷ ${d} ＝ ？`; ans=q;
-          explanation=`${d*q}÷${d}＝${ans}`; hintGuide=`💡 想想除法和乘法的關係。`;
-        } else if (stageId === "kanto_3") {
-          const a=90+((n*11)%110), b=3+(n%8), c=2+((n*2)%6); formula=`${a} － ${b} × ${c} ＝ ？`; ans=a-b*c;
-          explanation=`先乘：${b}×${c}=${b*c}；再算 ${a}-${b*c}=${ans}`; hintGuide=`💡 先乘除，再加減。`;
-        } else {
-          const d=5+n, a=1+(n%(d-1)), b=1+((n*2)%(d-a)); formula=`${a}/${d} ＋ ${b}/${d} ＝ ？/${d}`; ans=a+b;
-          explanation=`分母相同，分子相加：${a}+${b}=${ans}`; hintGuide=`💡 分母不變，只加分子。`;
-        }
-      } else {
-        if(stageId==="kalos_1"){const l=4+Math.floor((n-1)/9),w=2+((n-1)%9);formula=`${l}cm × ${w}cm ＝ ？cm²`;ans=l*w;explanation=`長×寬＝${ans}cm²`;hintGuide=`💡 面積＝長×寬。`;
-        } else if(stageId==="kalos_2"){const s=3+n;formula=`${s}cm × 4 ＝ ？cm`;ans=s*4;explanation=`${s}×4＝${ans}cm`;hintGuide=`💡 正方形有4條等長的邊。`;
-        } else if(stageId==="kalos_3"){const kg=1+(n%7),g=100+((n*100)%900);formula=`${kg}kg ＋ ${g}g ＝ ？g`;ans=kg*1000+g;explanation=`${kg}kg＝${kg*1000}g，再加${g}g＝${ans}g`;hintGuide=`💡 1kg＝1000g。`;
-        } else {const l=5+n,w=2+((n*2)%8);formula=`(${l}＋${w}) × 2 ＝ ？cm`;ans=(l+w)*2;explanation=`(${l}+${w})×2＝${ans}cm`;hintGuide=`💡 長方形周長＝(長＋寬)×2。`;}
-      }
-    }
-
-    // =========================== 4年級 ===========================
-    else if (grade === 4) {
-      if(region==="kanto"){
-        if(stageId==="kanto_1"){const a=(10+(n*7)%80)/100,b=(15+(n*11)%70)/100;formula=`${a.toFixed(2)} ＋ ${b.toFixed(2)} ＝ ？`;ans=+(a+b).toFixed(2);explanation=`答案 ${ans}`;hintGuide=`💡 小數點對齊。`;
-        }else if(stageId==="kanto_2"){const w=1+Math.floor((n-1)/5),num=1+((n-1)%5);formula=`${w} ${num}/5 ＝ ？/5`;ans=w*5+num;explanation=`${w}×5＋${num}＝${ans}`;hintGuide=`💡 整數乘分母，再加分子。`;
-        }else if(stageId==="kanto_3"){const a=12+n,b=3+(n%9);formula=`${a}萬 ＋ ${b}萬 ＝ ？萬`;ans=a+b;explanation=`${a}+${b}＝${ans}萬`;hintGuide=`💡 單位相同直接相加。`;
-        }else{const a=(50+(n*9)%40)/100,b=(10+(n*7)%30)/100;formula=`${a.toFixed(2)} － ${b.toFixed(2)} ＝ ？`;ans=+(a-b).toFixed(2);explanation=`${a.toFixed(2)}-${b.toFixed(2)}=${ans}`;hintGuide=`💡 小數點對齊。`;}
-      }else{
-        if(stageId==="kalos_1"){const a=4+(n%9),b=3+((n*2)%8),c=2+(n%7);formula=`(${a}＋${b}) × ${c} ＝ ？`;ans=(a+b)*c;explanation=`先括號：${a+b}，再乘${c}＝${ans}`;hintGuide=`💡 先算括號。`;
-        }else if(stageId==="kalos_2"){const x=40+(n%30),y=35+((n*3)%25);let ang1=x,ang2=y;if(ang1+ang2>=150)ang2=149-ang1;formula=`三角形：${ang1}° ＋ ${ang2}° ＋ ？° ＝ 180°`;ans=180-ang1-ang2;explanation=`180-${ang1}-${ang2}=${ans}°`;hintGuide=`💡 三角形內角和是180°。`;
-        }else if(stageId==="kalos_3"){const km=1+n,m=100+((n*75)%900);formula=`${km}km ＋ ${m}m ＝ ？m`;ans=km*1000+m;explanation=`${km}km=${km*1000}m，再加${m}m＝${ans}m`;hintGuide=`💡 1km＝1000m。`;
-        }else{const a=2+(n%8),b=2+((n*3)%7);formula=`${a}/4 × ${b} ＝ ？`;ans=+(a*b/4).toFixed(2);explanation=`${a}/4×${b}＝${ans}`;hintGuide=`💡 先乘分子，再處理分母。`;}
-      }
-    }
-
-    // =========================== 5年級 ===========================
-    else if (grade === 5) {
-      if(region==="kanto"){
-        if(stageId==="kanto_1"){const a=20+n,b=12+n*2;formula=`最大公因數 GCD(${a}, ${b}) ＝ ？`;ans=getGCD(a,b);explanation=`GCD(${a},${b})＝${ans}`;hintGuide=`💡 找兩數共同的最大因數。`;
-        }else if(stageId==="kanto_2"){const d1=3+(n%6),d2=4+((n*2)%7);const a=1+(n%d1),b=1+(n%d2);formula=`${a}/${d1} ＋ ${b}/${d2} ＝ ？`;ans=+(a/d1+b/d2).toFixed(4);explanation=`通分後計算，答案約為 ${ans}`;hintGuide=`💡 先找公倍數，再通分。`;
-        }else if(stageId==="kanto_3"){const a=20+(n*7)%40,b=2+(n%8),c=2+((n*3)%7);formula=`(${a} ＋ ${b}) ÷ ${c} ＝ ？`;ans=+( (a+b)/c ).toFixed(2);explanation=`先括號：${a+b}，再除${c}，答案${ans}`;hintGuide=`💡 先算括號。`;
-        }else{const top=4+n,bottom=8+n,h=2+(n%6);formula=`梯形：上底${top}、下底${bottom}、高${h}，面積＝？`;ans=((top+bottom)*h)/2;explanation=`(${top}+${bottom})×${h}÷2＝${ans}`;hintGuide=`💡 梯形面積＝(上底＋下底)×高÷2。`;}
-      }else{
-        if(stageId==="kalos_1"){const a=2+(n%5),b=3+((n*2)%6);formula=`${a}/${b} × ${2+(n%7)} ＝ ？`;ans=+(a/b*(2+(n%7))).toFixed(4);explanation=`分數乘法結果為 ${ans}`;hintGuide=`💡 先約分，再相乘。`;
-        }else if(stageId==="kalos_2"){const l=3+(n%8),w=2+((n*2)%7),h=2+((n*3)%6);formula=`長方體 ${l}×${w}×${h}cm，體積＝？cm³`;ans=l*w*h;explanation=`${l}×${w}×${h}＝${ans}cm³`;hintGuide=`💡 體積＝長×寬×高。`;
-        }else if(stageId==="kalos_3"){const l=2+(n%8),ml=100+((n*125)%900);formula=`${l}L ＋ ${ml}mL ＝ ？mL`;ans=l*1000+ml;explanation=`${l}L=${l*1000}mL，再加${ml}mL＝${ans}mL`;hintGuide=`💡 1L＝1000mL。`;
-        }else{const price=200+n*50,rate=[0.7,0.75,0.8,0.85][n%4];formula=`${price} × ${rate} ＝ ？`;ans=+(price*rate).toFixed(2);explanation=`${price}×${rate}＝${ans}`;hintGuide=`💡 百分率先換成小數再乘。`;}
-      }
-    }
-
-    // =========================== 6年級 ===========================
-    else {
-      if(region==="kanto"){
-        if(stageId==="kanto_1"){const baseA=2+(n%8),baseB=3+((n*2)%7),g=getGCD(baseA,baseB);const A=baseA*(1+n%4),B=baseB*(1+(n*3)%4);const gg=getGCD(A,B);formula=`${A} : ${B} 化成最簡整數比，前項＝？`;ans=A/gg;explanation=`最大公因數${gg}，前項${A}÷${gg}＝${ans}`;hintGuide=`💡 兩項同除最大公因數。`;
-        }else if(stageId==="kanto_2"){const r=2+n;formula=`半徑 ${r}cm，π＝3.14，圓面積＝？cm²`;ans=+(r*r*3.14).toFixed(2);explanation=`${r}×${r}×3.14＝${ans}`;hintGuide=`💡 圓面積＝半徑×半徑×π。`;
-        }else if(stageId==="kanto_3"){const a=2+(n%7),b=2+(n%6);formula=`${a} ÷ ${b}/${3+b} ＝ ？`;ans=+(a/((b)/(3+b))).toFixed(4);explanation=`除以分數等於乘倒數，答案${ans}`;hintGuide=`💡 除以分數要乘它的倒數。`;
-        }else{const r=3+n,deg=[60,90,120,180][n%4];formula=`半徑${r}cm、圓心角${deg}°，π＝3.14，扇形面積＝？cm²`;ans=+(r*r*3.14*deg/360).toFixed(2);explanation=`${r}×${r}×3.14×${deg}/360＝${ans}`;hintGuide=`💡 先求整圓面積，再乘圓心角比例。`;}
-      }else{
-        if(stageId==="kalos_1"){const x=2+(n%12),b=4+(n%9),m=2+(n%4);formula=`${m}x ＋ ${b} ＝ ${m*x+b}，x＝？`;ans=x;explanation=`先減${b}，再除${m}，x＝${x}`;hintGuide=`💡 用逆運算解未知數。`;
-        }else if(stageId==="kalos_2"){const s1=30+(n%5)*5,s2=45+(n%4)*5,dist=180+(n%8)*30;formula=`甲${s1}km/h、乙${s2}km/h，相距${dist}km相向，幾小時相遇？`;ans=+(dist/(s1+s2)).toFixed(2);explanation=`${dist}÷(${s1}+${s2})＝${ans}小時`;hintGuide=`💡 相向而行要把兩個速率相加。`;
-        }else if(stageId==="kalos_3"){const r=2+(n%7),h=4+(n%8);formula=`圓柱半徑${r}cm、高${h}cm，π＝3.14，體積＝？cm³`;ans=+(r*r*3.14*h).toFixed(2);explanation=`${r}×${r}×3.14×${h}＝${ans}`;hintGuide=`💡 圓柱體積＝底面積×高。`;
-        }else{const rabbits=2+(n%9),chickens=4+(n%8),feet=4*rabbits+2*chickens,total=rabbits+chickens;formula=`雞兔共${total}隻，共有${feet}隻腳，兔有？隻`;ans=rabbits;explanation=`用兩腳與四腳差異求得兔數${ans}`;hintGuide=`💡 先假設全部是雞，再看多出的腳。`;}
-      }
-    }
-
-    // 生成四個互不重複、一定包含正確答案的選項
-    const options = new Set([ans]);
-    let delta = Math.max(1, Number.isInteger(ans) ? Math.max(1, Math.round(Math.abs(ans)*0.08)) : 0.25);
-    const candidates = [
-      ans + delta, ans - delta, ans + delta*2, ans - delta*2,
-      ans + delta*3, ans - delta*3, ans + 1, ans - 1, ans + 2, ans - 2
-    ];
-    for (const x of candidates) {
-      const wrong = typeof x === 'number' && !Number.isInteger(ans) ? +x.toFixed(4) : x;
-      if (wrong > 0 && wrong !== ans) options.add(wrong);
-      if (options.size >= 4) break;
+  function makeOptions(ans, seed) {
+    const a = Number(ans);
+    const step = Number.isInteger(a) ? Math.max(1, Math.round(Math.max(2, Math.abs(a) * 0.06))) : Math.max(0.1, safeRound(Math.abs(a) * 0.08, 2));
+    const raw = [a, a + step, a - step, a + step * 2, a - step * 2, a + step * 3, a - step * 3, a + 1, a - 1, a + 2, a - 2];
+    const out = [];
+    for (const v of raw) {
+      const n = Number.isInteger(a) ? Math.round(v) : safeRound(v, 2);
+      if (n > 0 && !out.some(x => Math.abs(x - n) < 1e-8)) out.push(n);
+      if (out.length === 4) break;
     }
     let bump = 1;
-    while (options.size < 4) {
-      const wrong = Number.isInteger(ans) ? ans + bump : +(ans + bump*0.5).toFixed(4);
-      if (wrong > 0 && wrong !== ans) options.add(wrong);
-      bump++;
+    while (out.length < 4) {
+      const n = Number.isInteger(a) ? Math.max(1, Math.round(a + step * (++bump))) : Math.max(0.01, safeRound(a + step * (++bump), 2));
+      if (!out.some(x => Math.abs(x - n) < 1e-8)) out.push(n);
     }
-    return { formula, ans, explanation, hintGuide, options: Array.from(options).sort(() => Math.random() - 0.5) };
+    const rot = Math.abs(seed) % out.length;
+    return out.slice(rot).concat(out.slice(0, rot));
+  }
+
+  function createMathProblemRaw(grade, region, stageId, qIndex, totalQ, versionKey = "combo") {
+    const n = Math.max(1, qIndex) + (typeof gradeQuestionSeed === "number" ? (gradeQuestionSeed % 997) : 0);
+    const vq = 1 + ((n - 1) % 30);
+    const cycle = Math.floor((n - 1) / 10);
+    const upper = region === "kanto";
+    const stageNo = Number(stageId.split("_").pop());
+    const combo = versionKey === "combo";
+    let formula = "", ans = 0, explanation = "", hintGuide = "";
+
+    // 每一階段固定一組版本主題；第四 Boss 混合三版本
+    let mode = "";
+    if (grade === 2) {
+      const modesU = ["place", "addsub", "multiply", "mixed"], modesD = ["length", "division", "time", "mixed"];
+      mode = (upper ? modesU : modesD)[(stageNo - 1) % 4];
+      if (combo) mode = ["place","addsub","multiply","time"][n % 4];
+      if (mode === "place") {
+        const h = 1 + ((n + cycle * 2) % 9), t = 2 + ((n * 3 + cycle * 5) % 9), o = 1 + ((n * 5 + Math.floor((n-1)/3)) % 9);
+        const x = h * 100 + t * 10 + o;
+        const digit = n % 3 === 0 ? h : n % 3 === 1 ? t : o;
+        formula = `${x} ＝ ${h}×100 ＋ ${t}×10 ＋ ${n%3===2?o:"？"}`;
+        ans = digit; explanation = `位值分解後，所問位置的數字是 ${ans}`; hintGuide = "💡 先看百位、十位、個位的位值。";
+      } else if (mode === "addsub") {
+        const a = 120 + ((n * 37) % 780), b = 35 + ((n * 29) % 460);
+        const sub = n % 2 === 0;
+        formula = sub ? `${a} － ${Math.min(b, a-1)} ＝ ？` : `${a} ＋ ${b} ＝ ？`;
+        ans = sub ? a - Math.min(b, a-1) : a + b; explanation = `${formula.replace("？", ans)}`; hintGuide = "💡 對齊位值後計算。";
+      } else if (mode === "multiply") {
+        const a = 2 + ((n + cycle * 2) % 8), b = 2 + ((n * 3 + cycle * 5) % 8);
+        const extra = combo ? vq : 0;
+        formula = extra ? `${a} × ${b} ＋ ${extra} ＝ ？` : `${a} × ${b} ＝ ？`; ans = a*b + extra; explanation = `${a}×${b}＝${ans}`; hintGuide = "💡 想想乘法口訣。";
+      } else if (mode === "division") {
+        const d = 2 + ((n + cycle * 2) % 8), q = 4 + ((n * 7 + cycle * 5 + Math.floor((n-1)/8)) % 20);
+        formula = `${d*q} ÷ ${d} ＝ ？`; ans = q; explanation = `${d*q}÷${d}＝${q}`; hintGuide = "💡 想想哪個數乘上除數會得到被除數。";
+      } else if (mode === "length") {
+        const m = 1 + ((n + cycle) % 8), cm = 5 + ((n*7 + cycle*11)%95);
+        formula = `${m}m ${cm}cm ＝ ？cm`; ans = m*100+cm; explanation = `${m}m＝${m*100}cm；共 ${ans}cm`; hintGuide = "💡 1m＝100cm。";
+      } else if (mode === "time") {
+        const h = 1 + ((n + cycle) % 3), m = (n*10 + cycle*7 + Math.floor((n-1)/3)*11)%60, startMin=60+((n-1)%30);
+        const sh=Math.floor(startMin/60), sm=startMin%60;
+        formula = `${String(sh).padStart(2,"0")}:${String(sm).padStart(2,"0")} ＋ ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ＝ ？分`;
+        ans = startMin + h*60 + m; explanation = `80＋${h*60+m}＝${ans}分`; hintGuide = "💡 先把時間換成分鐘。";
+      } else {
+        const a=3+((n+cycle*2)%7), b=2+((n*2+cycle*3)%8), c=4+((n+cycle*5)%5), variant=1+((n-1)%30);
+        formula=`${a} × ${b} ＋ ${c} ＋ ${variant} ＝ ？`; ans=a*b+c+variant; explanation=`先乘後加，答案 ${ans}`; hintGuide="💡 先乘法，再加法。";
+      }
+    } else if (grade === 3) {
+      const modesU = ["number","addsub","multdiv","fraction"], modesD = ["area","measure","fraction","decimal"];
+      mode = (upper ? modesU : modesD)[(stageNo-1)%4];
+      if (combo) mode=["number","multdiv","area","decimal"][n%4];
+      if(mode==="number"){const a=1000+((n*137+cycle*101)%9000),b=100+((n*83+cycle*37)%900);formula=`${a} ＋ ${b} ＝ ？`;ans=a+b;explanation=`${a}+${b}=${ans}`;hintGuide="💡 對齊位值。";}
+      else if(mode==="addsub"){const a=1500+((n*71+cycle*97)%7000),b=200+((n*43+cycle*31)%1500);formula=`${a} － ${b} ＝ ？`;ans=a-b;explanation=`${a}-${b}=${ans}`;hintGuide="💡 由個位開始減。";}
+      else if(mode==="multdiv"){if(n%2){const a=120+(n*37+cycle*41)%700,b=2+((n+cycle)%8),variant=1+((n-1)%30);formula=`${a} × ${b} ＋ ${variant} ＝ ？`;ans=a*b+variant;explanation=`${a}×${b}=${ans}`;hintGuide="💡 先算個位，再算十位。";}else{const d=3+((n+cycle)%7),q=30+(n*11+cycle*13)%70,extra=combo?vq:0;formula=extra?`${d*(q+extra)} ÷ ${d} ＝ ？`:`${d*q} ÷ ${d} ＝ ？`;ans=q+extra;explanation=`${d*q}÷${d}=${q}`;hintGuide="💡 乘除互為逆運算。";}}
+      else if(mode==="fraction"){const d=4+((n+cycle)%7),a=1+((n+cycle)%(d-1)),b=1+((n*2+cycle)%(d-a)),extra=combo ? vq : 0;formula=extra ? `${a}/${d} ＋ ${b}/${d} ＋ ${extra}/${d} ＝ ？/${d}` : `${a}/${d} ＋ ${b}/${d} ＝ ？/${d}`;ans=a+b+extra;explanation=`分母相同，分子相加：${a}+${b}=${ans}`;hintGuide="💡 分母不變。";}
+      else if(mode==="area"){const l=5+((n+cycle)%15),w=3+((n*2+cycle)%12),extra=combo?vq:0;formula=extra?`${l}cm × ${w}cm ＋ ${extra}cm² ＝ ？cm²`:`${l}cm × ${w}cm ＝ ？cm²`;ans=l*w+extra;explanation=`長×寬=${ans}cm²`;hintGuide="💡 長方形面積＝長×寬。";}
+      else if(mode==="measure"){const kg=1+((n+cycle)%8),g=100+(n*73+cycle*17)%900;formula=`${kg}kg ＋ ${g}g ＝ ？g`;ans=kg*1000+g;explanation=`${kg}kg=${kg*1000}g；答案 ${ans}g`;hintGuide="💡 1kg＝1000g。";}
+      else if(mode==="decimal"){const a=(1+((n+cycle*2)%9))/10,b=(1+((n*3+cycle*5)%9))/10,variant=combo ? vq/100 : 0;formula=variant ? `${a.toFixed(1)} ＋ ${b.toFixed(1)} ＋ ${variant.toFixed(2)} ＝ ？` : `${a.toFixed(1)} ＋ ${b.toFixed(1)} ＝ ？`;ans=safeRound(a+b+variant,2);explanation=`${a}+${b}=${ans}`;hintGuide="💡 小數點對齊。";}
+    } else if (grade === 4) {
+      const modesU=["big","mult","angle","divide"],modesD=["multi","quad","decimal","volume"];
+      mode=(upper?modesU:modesD)[(stageNo-1)%4];
+      if(combo) mode=["big","divide","decimal","volume"][n%4];
+      if(mode==="big"){const a=100000+(n*1379+cycle*1009)%900000,b=10000+(n*911+cycle*607)%400000;formula=`${a} ＋ ${b} ＝ ？`;ans=a+b;explanation=`${a}+${b}=${ans}`;hintGuide="💡 先看位值再計算。";}
+      else if(mode==="mult"){const a=120+(n*37+cycle*41)%880,b=12+((n+cycle)%18);formula=`${a} × ${b} ＝ ？`;ans=a*b;explanation=`${a}×${b}=${ans}`;hintGuide="💡 依位數分開乘。";}
+      else if(mode==="angle"){const a=35+((n+cycle)%50),b=40+((n*3+cycle)%60);const c=Math.max(1,180-a-b);formula=`三角形：${a}° ＋ ${b}° ＋ ？° ＝ 180°`;ans=c;explanation=`180-${a}-${b}=${c}°`;hintGuide="💡 三角形內角和180°。";}
+      else if(mode==="divide"){const d=12+((n+cycle)%18),q=20+(n*7+cycle*3)%50;formula=`${d*q} ÷ ${d} ＝ ？`;ans=q;explanation=`${d*q}÷${d}=${q}`;hintGuide="💡 用乘法反推商。";}
+      else if(mode==="multi"){const a=1200+(n*91+cycle*53)%7000,b=12+((n+cycle)%8);formula=`${a} × ${b} ＝ ？`;ans=a*b;explanation=`${a}×${b}=${ans}`;hintGuide="💡 多位數乘法。";}
+      else if(mode==="quad"){const l=8+(n%20),w=5+((n*2)%15);formula=`長方形長${l}cm、寬${w}cm，面積＝？cm²`;ans=l*w;explanation=`${l}×${w}=${ans}cm²`;hintGuide="💡 面積＝長×寬。";}
+      else if(mode==="decimal"){const a=(12+((n+cycle)%70))/10,b=(5+((n*3+cycle)%40))/10;formula=`${a.toFixed(1)} × ${b.toFixed(1)} ＝ ？`;ans=safeRound(a*b,2);explanation=`${a}×${b}=${ans}`;hintGuide="💡 先當整數算，再決定小數位數。";}
+      else {const a=2+(n%8),b=3+((n*2)%7),c=2+(n%6);formula=`${a}cm × ${b}cm × ${c}cm ＝ ？cm³`;ans=a*b*c;explanation=`長×寬×高=${ans}cm³`;hintGuide="💡 長方體體積＝長×寬×高。";}
+    } else if (grade === 5) {
+      const modesU=["decimalAdd","factor","fraction","area"],modesD=["fracMult","volume","percent","surface"];
+      mode=(upper?modesU:modesD)[(stageNo-1)%4];
+      if(combo) mode=["factor","fraction","percent","volume"][n%4];
+      if(mode==="decimalAdd"){const a=(10+(n*13)%900)/100,b=(10+(n*17)%800)/100;formula=`${a.toFixed(2)} ＋ ${b.toFixed(2)} ＝ ？`;ans=safeRound(a+b,2);explanation=`${a}+${b}=${ans}`;hintGuide="💡 小數點對齊。";}
+      else if(mode==="factor"){const a=18+(n%20),b=12+(n%18);const g=gcd(a,b);formula=`${a} 和 ${b} 的最大公因數＝？`;ans=g;explanation=`最大公因數是 ${g}`;hintGuide="💡 找兩數共同的因數。";}
+      else if(mode==="fraction"){const d1=4+(n%6),d2=3+(n%5),a=1+(n%(d1-1)),b=1+(n%(d2-1));const L=lcm(d1,d2);ans=a*(L/d1)+b*(L/d2);formula=`${a}/${d1} ＋ ${b}/${d2} ＝ ？/${L}`;explanation=`通分後分子相加=${ans}`;hintGuide="💡 先找最小公倍數通分。";}
+      else if(mode==="area"){const b=8+((n+cycle)%20),h=5+((n*2+cycle)%15);formula=`平行四邊形底${b}cm、高${h}cm，面積＝？cm²`;ans=b*h;explanation=`底×高=${ans}cm²`;hintGuide="💡 平行四邊形面積＝底×高。";}
+      else if(mode==="fracMult"){const a=2+(n%5),d=3+(n%6),b=2+(n%4);formula=`${a}/${d} × ${b} ＝ ？`;ans=safeRound(a*b/d,2);explanation=`${a}×${b}/${d}=${ans}`;hintGuide="💡 先乘分子，再處理分母。";}
+      else if(mode==="volume"){const l=4+((n+cycle)%8),w=3+((n*2+cycle)%7),h=2+((n*3+cycle)%6);formula=`${l}×${w}×${h}cm³ 的長方體，體積＝？cm³`;ans=l*w*h;explanation=`${l}×${w}×${h}=${ans}`;hintGuide="💡 長×寬×高。";}
+      else if(mode==="percent"){const price=200+(((n*7 + cycle*11)%30))*50,rate=[0.7,0.75,0.8,0.85][(n+cycle*2)%4];formula=`${price} × ${rate} ＝ ？`;ans=safeRound(price*rate,2);explanation=`${price}×${rate}=${ans}`;hintGuide="💡 折數先轉成小數。";}
+      else {const l=3+((n+cycle)%8),w=2+((n*2+cycle)%7);formula=`長方體 ${l}×${w}×${w}cm，表面積＝？cm²`;ans=2*(l*w+l*w+w*w);explanation=`2×(${l}×${w}+${l}×${w}+${w}×${w})=${ans}`;hintGuide="💡 六個面的面積相加。";}
+    } else {
+      // 六年級：依三版本教材主題真正分流；第四 Boss 為三版本綜合
+      if (upper) {
+        const modes = {
+          hanlin:["gcf","fracdiv","decdiv","ratio"],
+          nan1:["prime","fracdiv","decdiv","circle"],
+          kang:["gcf","fracdiv","pattern","ratio"],
+          combo:["gcf","decdiv","ratio","circle"]
+        };
+        mode=modes[versionKey][(n-1)%4];
+      } else {
+        const modes = {
+          hanlin:["mixed","cylinder","rate","pie"],
+          nan1:["mixed","pie","base","scale"],
+          kang:["mixed","rate","cylinder","base"],
+          combo:["mixed","base","rate","cylinder"]
+        };
+        mode=modes[versionKey][(n-1)%4];
+      }
+      if(mode==="gcf"){const a=24+(n%36),b=18+((n*5)%42),g=gcd(a,b);formula=`${a} 和 ${b} 的最大公因數＝？`;ans=g;explanation=`最大公因數＝${g}`;hintGuide="💡 列出公因數或用短除法。";}
+      else if(mode==="prime"){const p=[2,3,5,7,11,13][n%6],q=[2,3,5,7,11][(n*3)%5],x=p*q;formula=`${x} 的一個質因數是？`;ans=p;explanation=`${x}＝${p}×${q}`;hintGuide="💡 找能整除原數的質數。";}
+      else if(mode==="fracdiv"){const a=2+((n+cycle)%7),d=3+((n+cycle)%6),b=2+((n+cycle)%5),e=3+((n+cycle)%4);formula=`${a}/${d} ÷ ${b}/${e} ＝ ？`;ans=safeRound((a/d)/(b/e),4);explanation=`除以分數改乘倒數，答案 ${ans}`;hintGuide="💡 除以分數等於乘倒數。";}
+      else if(mode==="decdiv"){const b=[0.2,0.4,0.5,0.8][n%4],q=3+(n%9),a=safeRound(b*q,2);formula=`${a} ÷ ${b} ＝ ？`;ans=q;explanation=`${a}÷${b}=${q}`;hintGuide="💡 先把除數變成整數思考。";}
+      else if(mode==="ratio"){const a=6+(n%15),b=4+((n*2)%12),g=gcd(a,b);formula=`${a}：${b} 化成最簡整數比，前項＝？`;ans=a/g;explanation=`最大公因數${g}，${a}÷${g}=${ans}`;hintGuide="💡 兩項同除最大公因數。";}
+      else if(mode==="circle"){const r=3+((n+cycle)%10);formula=`半徑${r}cm，π＝3.14，圓面積＝？cm²`;ans=safeRound(r*r*3.14,2);explanation=`${r}×${r}×3.14=${ans}`;hintGuide="💡 圓面積＝半徑×半徑×π。";}
+      else if(mode==="pattern"){const a=5+((n+cycle)%9),d=2+((n+cycle)%6),k=4+((n+cycle)%7);formula=`數列 ${a}、${a+d}、${a+2*d}……第${k}項＝？`;ans=a+(k-1)*d;explanation=`首項${a}，公差${d}，第${k}項=${ans}`;hintGuide="💡 每次增加相同的數。";}
+      else if(mode==="mixed"){const a=(2+((n+cycle)%8))/10,b=1+((n+cycle)%5),c=2+((n+cycle)%7),variant=((n-1)%6)/10;formula=`${a} ＋ ${b} × ${c} ＋ ${variant.toFixed(1)} ＝ ？`;ans=safeRound(a+b*c+variant,2);explanation=`先乘後加=${ans}`;hintGuide="💡 先乘除，再加減。";}
+      else if(mode==="cylinder"){const r=2+((n*3+cycle*5)%12),h=4+((n*5+cycle*7)%12);formula=`圓柱半徑${r}cm、高${h}cm，π＝3.14，體積＝？cm³`;ans=safeRound(r*r*3.14*h,2);explanation=`${r}×${r}×3.14×${h}=${ans}`;hintGuide="💡 底面積×高。";}
+      else if(mode==="rate"){const t=2+((n+cycle*2)%5),v=30+((n*3+cycle*5)%20)*10;formula=`速率${v}km/h，行駛${t}小時，距離＝？km`;ans=v*t;explanation=`速率×時間=${ans}km`;hintGuide="💡 距離＝速率×時間。";}
+      else if(mode==="pie"){const total=100+((n*3+cycle*5)%20)*50,pct=[0.2,0.25,0.3,0.4][(n+cycle)%4];formula=`總數${total}，圓形圖占 ${pct*100}% ，數量＝？`;ans=safeRound(total*pct,2);explanation=`${total}×${pct}=${ans}`;hintGuide="💡 百分率轉小數再乘。";}
+      else if(mode==="base"){const base=40+((n*3+cycle*5)%30)*5,pct=0.2+((n+cycle)%4)*0.1;formula=`基準量${base}，比較量是基準量的${pct*100}% ，比較量＝？`;ans=safeRound(base*pct,2);explanation=`${base}×${pct}=${ans}`;hintGuide="💡 比較量＝基準量×比率。";}
+      else if(mode==="scale"){const a=4+((n*3+cycle*5)%15),scale=2+((n+cycle)%4);formula=`原圖${a}cm，放大${scale}倍，對應長＝？cm`;ans=a*scale;explanation=`${a}×${scale}=${ans}`;hintGuide="💡 對應長度乘放大倍數。";}
+      else {const r=2+(n%5),h=4+(n%7);formula=`柱體底面積${r*r}cm²、高${h}cm，體積＝？cm³`;ans=r*r*h;explanation=`底面積×高=${ans}`;hintGuide="💡 柱體體積＝底面積×高。";}
+    }
+    const options=makeOptions(ans,n*stageNo);
+    return {formula,ans,explanation,hintGuide,options};
   }
 
   /* ================= 抓寶系統邏輯 ================= */
@@ -2376,7 +2412,6 @@
     startTime = Date.now();
     currentStreak = 0;
 
-    usedProblemSignatures.clear();
     gradeQuestionSeed = Math.floor(Math.random() * 1000000);
 
     remainingHints = 3;
