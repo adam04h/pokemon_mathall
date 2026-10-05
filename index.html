@@ -1541,16 +1541,23 @@
 
   function ensureAudio() {
     try {
+      if (!bgmEnabled) return false;
       if (!audioCtx) initAudioBus();
       if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
-    } catch (e) {}
+      return !!(audioCtx && masterGain);
+    } catch (e) {
+      return false;
+    }
   }
 
   function playSynthTone(freq, type, duration, delay = 0, vol = 0.15) {
+    // 「音樂: 關」現在是總音訊開關：背景音樂與所有音效都必須停止。
+    if (!bgmEnabled) return;
     setTimeout(() => {
       try {
-        ensureAudio();
-        if (!audioCtx || !masterGain) return;
+        // 延遲音效在真正播放前再次確認，避免關閉音效後仍播放排程中的音符。
+        if (!bgmEnabled) return;
+        if (!ensureAudio()) return;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type;
@@ -1634,12 +1641,28 @@
   function toggleBGM() {
     bgmEnabled = !bgmEnabled;
     const btn = document.getElementById("bgm-toggle-btn");
+
     if (bgmEnabled) {
       btn.innerText = "🔊 音樂: 開";
+      // 恢復整個音訊匯流排，並重新啟動背景音樂。
+      try {
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        if (masterGain && audioCtx) {
+          masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          masterGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+        }
+      } catch (e) {}
       startBGM();
     } else {
       btn.innerText = "🔇 音樂: 關";
+      // 關閉時立即靜音整個音訊匯流排，並停止背景音樂計時器。
       stopBGM();
+      try {
+        if (masterGain && audioCtx) {
+          masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+          masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        }
+      } catch (e) {}
     }
   }
 
