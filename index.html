@@ -2292,6 +2292,20 @@
         problem.optionValues = problem.options.slice();
       }
 
+      // 最重要的安全檢查：正確答案「一定」必須存在於四個選項中。
+      // 二年級尤其避免出現「9 × 9 ＝？」卻沒有 81 的情況。
+      if (Array.isArray(problem.optionValues) && problem.optionValues.length === 4) {
+        const answerIsPresent = problem.optionValues.some(v => {
+          if (typeof problem.ans === "number" && typeof v === "number") {
+            return Math.abs(v - problem.ans) < 0.000001;
+          }
+          return String(v) === String(problem.ans);
+        });
+        if (!answerIsPresent) continue;
+      } else {
+        continue;
+      }
+
       const signature = `${problem.formula}_${problem.ans}`;
       if (!usedProblemSignatures.has(signature)) {
         usedProblemSignatures.add(signature);
@@ -2316,14 +2330,159 @@
     const intQ = grade===2 ? 2 : grade===3 ? 3 : 4;
 
     if (grade === 2) {
-      if (/數到|以內的數|數/.test(unit)) { const hi=isHigh?900:isMid?500:200; const a=num(20,hi); formula=`${npc} 收集了 ${a} 顆樹果，${isHigh?"又找到幾顆後共有 "+(a+num(10,80))+" 顆，新增幾顆？":"這個數字的百位是幾？"}`; if(isHigh){ const total=a+num(10,80); ans=total-a; formula=`${npc} 原本有 ${a} 顆樹果，又找到一些後共有 ${total} 顆，找到幾顆？`; explanation=`${total}－${a}＝${ans}。`; } else { ans=Math.floor(a/100); explanation=`看 ${a} 的百位數字即可。`; } hintGuide=`💡 先找出題目要比較的是位值、大小還是數量。`; }
-      else if (/加減|加加減減|加減應用|兩步驟/.test(unit)) { const a=num(20,grade===2?90:grade===3?600:900), b=num(10,Math.min(200,a)), c=num(5,50); if(isHigh){formula=`${a} ＋ ${b} － ${c} ＝ ？`; ans=a+b-c; explanation=`先加後減：${a+b}－${c}＝${ans}。`;} else if(isMid){formula=`${a} － ${b} ＝ ？`; ans=a-b; explanation=`${a}－${b}＝${ans}。`;} else {formula=`${a} ＋ ${b} ＝ ？`; ans=a+b; explanation=`${a}＋${b}＝${ans}。`;} hintGuide=`💡 先看清楚是增加、減少，還是需要兩個步驟。`; }
-      else if (/公分|公尺|量長度|長度/.test(unit)) { const cm=num(20,90), cm2=num(10,50), m=num(1,5); if(/公尺/.test(unit)&&isMid){formula=`${m} 公尺 ${cm} 公分 ＝ 多少公分？`; ans=m*100+cm; explanation=`${m} 公尺＝${m*100} 公分，再加 ${cm} 公分。`;} else { const first=cm===cm2 ? cm+10 : cm; const second=cm===cm2 ? cm2+20 : cm2; const correct=first>second ? 0 : 1; formula=`一條線長 ${first} 公分，另一條長 ${second} 公分，哪一條比較長？`; ans=correct; explanation=`比較 ${first} 公分和 ${second} 公分，${correct===0?"第一條":"第二條"}比較長。`; problemOptionLabels=["第一條","第二條","兩條一樣長","無法判斷"]; problemOptionValues=[0,1,2,3]; } hintGuide=`💡 注意單位相同後再比較或換算。`; }
-      else if (/乘法|倍/.test(unit)) { const a=num(2,9), b=num(2,9); formula=`${a} × ${b} ＝ ？`; ans=a*b; explanation=`${a} 個 ${b} 合起來是 ${ans}。`; hintGuide=`💡 用乘法口訣找答案。`; }
-      else if (/分裝|平分|分東西/.test(unit)) { const d=num(2,8), q=num(2,9), total=d*q; formula=`有 ${total} 顆樹果，平均分給 ${d} 隻寶可夢，每隻幾顆？`; ans=q; explanation=`${total} ÷ ${d}＝${q}。`; hintGuide=`💡 想一想「幾乘以分給的隻數等於總數」。`; }
-      else if (/時間|幾時幾分|年、月、日|年月日/.test(unit)) { const h=num(1,10), add=num(1,4); formula=`現在是上午 ${h} 點，再過 ${add} 小時是幾點？`; ans=h+add; explanation=`${h}＋${add}＝${ans} 點。`; hintGuide=`💡 經過時間就是把小時往後數。`; }
-      else if (/分數|單位分數/.test(unit)) { const d=pick([2,3,4,5,6]), n=isHigh?d-1:1; formula=`把一個相同大小的整體分成 ${d} 份，取其中 ${n} 份，是幾分之幾？`; ans=n; explanation=`分母是總份數 ${d}，分子是取出的份數 ${n}。`; hintGuide=`💡 分母看「分成幾份」，分子看「取幾份」。`; }
-      else { const a=num(2,8), b=num(2,8); formula=`比較 ${a} 個單位和 ${b} 個單位，哪個比較大？`; ans=Math.max(a,b); explanation=`${Math.max(a,b)} 比 ${Math.min(a,b)} 大。`; hintGuide=`💡 先比較兩個數量。`; }
+      // 二年級：題目以「數字＋數學符號」為主；若概念需要語意，改用注音，不使用中文字。
+      // 每一題都必須能只靠題目本身判斷唯一答案，避免出現「175 → ?」卻不知道要找哪一位的問題。
+      const stageNo = parseInt(String(stageId).split("_").pop(), 10) || 1;
+      const type = (qIndex + stageNo) % 10;
+      const rint = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
+      const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+      const numericOptions = (answer, offsets=[-1,1,2]) => {
+        const correct = Number(answer);
+        const vals = [correct];
+        const seen = new Set([correct]);
+        for (const off of offsets) {
+          const v = Number((correct + off).toFixed(2));
+          if (v >= 0 && !seen.has(v)) { seen.add(v); vals.push(v); }
+          if (vals.length === 4) break;
+        }
+        let k = 1;
+        while (vals.length < 4) {
+          const v = Number((correct + k).toFixed(2));
+          if (v >= 0 && !seen.has(v)) { seen.add(v); vals.push(v); }
+          k++;
+        }
+        return shuffle(vals).map(String);
+      };
+
+      // 以「位值拆解」取代原本沒有指定位置的「175 → ?」。
+      // 例如：175 = ?×100 + 7×10 + 5，答案唯一為 1。
+      if (type === 0 || /數到|以內的數/.test(unit)) {
+        const a = rint(isHigh ? 300 : isMid ? 100 : 20, isHigh ? 999 : isMid ? 600 : 199);
+        const digitType = qIndex % 3; // 0=百位、1=十位、2=個位
+        const hundreds = Math.floor(a/100), tens = Math.floor(a/10)%10, ones = a%10;
+        if (digitType === 0) {
+          formula = `${a} ＝ ? × 100 ＋ ${tens} × 10 ＋ ${ones}`;
+          ans = hundreds;
+        } else if (digitType === 1) {
+          formula = `${a} ＝ ${hundreds} × 100 ＋ ? × 10 ＋ ${ones}`;
+          ans = tens;
+        } else {
+          formula = `${a} ＝ ${hundreds} × 100 ＋ ${tens} × 10 ＋ ?`;
+          ans = ones;
+        }
+        problemOptionLabels = numericOptions(ans, [-2,-1,1,2]);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(ans));
+        hintGuide = `💡 ×100／×10／＋`;
+      } else if (type === 1 || /加減|加加減減|兩步驟/.test(unit)) {
+        const a = rint(isBasic?10:30, isHigh?90:80);
+        const b = rint(5, Math.min(40,a));
+        if (isHigh) {
+          const c = rint(2, Math.min(15, a+b-1));
+          formula = `${a} ＋ ${b} － ${c} ＝ ?`;
+          ans = a+b-c;
+        } else if (isMid) {
+          formula = `${a} － ${b} ＝ ?`;
+          ans = a-b;
+        } else {
+          formula = `${a} ＋ ${b} ＝ ?`;
+          ans = a+b;
+        }
+        problemOptionLabels = numericOptions(ans, [-10,-1,1,10]);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(ans));
+        hintGuide = `💡 ＋／－`;
+      } else if (type === 2 || /公分|公尺|量長度|長度/.test(unit)) {
+        // 長度比較不需要文字，直接比較數值與符號。
+        const a = rint(10,90), b = rint(10,90);
+        ans = a>b ? '＞' : a<b ? '＜' : '＝';
+        formula = `${a} ? ${b}`;
+        problemOptionLabels = ['＞','＜','＝'];
+        // 四選一不硬塞無意義符號，改以四個數學關係符號，且只有一個正確。
+        problemOptionLabels = ['＞','＜','＝','≠'];
+        problemOptionValues = problemOptionLabels.slice();
+        explanation = `${a} ${ans} ${b}`;
+        hintGuide = `💡 ＞／＜／＝`;
+      } else if (type === 3 || /乘法|倍/.test(unit)) {
+        const a = rint(2,9), b = rint(2,9);
+        formula = `${a} × ${b} ＝ ?`;
+        ans = a * b;
+        // 先放入正確答案，再產生 3 個不同的干擾數，確保 9×9 一定包含 81。
+        const multVals = new Set([ans]);
+        [ans - a, ans - 1, ans + 1, ans + b, ans - b, ans + 2].forEach(v => {
+          if (v > 0 && v !== ans && multVals.size < 4) multVals.add(v);
+        });
+        let mv = 2;
+        while (multVals.size < 4) {
+          const v = ans + mv++;
+          if (v > 0 && v !== ans) multVals.add(v);
+        }
+        problemOptionLabels = shuffle([...multVals]).map(String);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(ans));
+        hintGuide = `💡 ×`;
+      } else if (type === 4 || /分裝|平分|分東西/.test(unit)) {
+        const d = rint(2,9), q = rint(2,9), total=d*q;
+        formula = `${total} ÷ ${d} ＝ ?`;
+        ans = q;
+        problemOptionLabels = numericOptions(ans, [-2,-1,1,2]);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(q));
+        hintGuide = `💡 ÷`;
+      } else if (type === 5 || /時間|幾時幾分/.test(unit)) {
+        const h = rint(1,10), m = rint(0,5)*10, addH = rint(0,2), addM = rint(0,5)*10;
+        const startMinutes = h*60+m, endMinutes = startMinutes + addH*60 + addM;
+        const endH = Math.floor(endMinutes/60), endM = endMinutes%60;
+        formula = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} ＋ ${String(addH).padStart(2,'0')}:${String(addM).padStart(2,'0')} ＝ ?`;
+        ans = endMinutes;
+        // 時間題一定把正確時間放進選項，再加入前後 30／60 分鐘作為干擾。
+        const timeCandidates = [endMinutes, endMinutes - 60, endMinutes + 60, endMinutes - 30, endMinutes + 30]
+          .map(v => Math.max(0, v))
+          .filter((v,i,a) => a.indexOf(v) === i);
+        while (timeCandidates.length < 4) timeCandidates.push(endMinutes + timeCandidates.length * 10 + 10);
+        const timeOptions = timeCandidates.slice(0,4);
+        problemOptionLabels = shuffle(timeOptions).map(v => `${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`);
+        problemOptionValues = problemOptionLabels.map(v => { const [hh,mm]=v.split(':').map(Number); return hh*60+mm; });
+        explanation = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+        hintGuide = `💡 ＋／時:分`;
+      } else if (type === 6 || /分數|單位分數/.test(unit)) {
+        const d = [2,3,4,5,6][qIndex%5], n = isHigh ? Math.min(d-1,2) : 1;
+        const nume = n+n;
+        formula = `${n}/${d} ＋ ${n}/${d} ＝ ?`;
+        ans = nume/d;
+        const answerText = `${nume}/${d}`;
+        const opts = [answerText, `${Math.max(1,nume-1)}/${d}`, `${nume+1}/${d}`, `${n}/${d}`];
+        problemOptionLabels = shuffle([...new Set(opts)]);
+        while (problemOptionLabels.length < 4) problemOptionLabels.push(`${nume+2}/${d}`);
+        problemOptionLabels = problemOptionLabels.slice(0,4);
+        problemOptionValues = problemOptionLabels.map(x => { const [a,b]=x.split('/').map(Number); return a/b; });
+        explanation = answerText;
+        hintGuide = `💡 ＋／／`;
+      } else if (type === 7) {
+        const m = rint(1,5), cm = rint(10,90);
+        formula = `${m} × 100 ＋ ${cm} ＝ ?`;
+        ans = m*100+cm;
+        problemOptionLabels = numericOptions(ans, [-100,-10,10,100]);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(ans));
+        hintGuide = `💡 ×100／＋`;
+      } else if (type === 8) {
+        const a = rint(20,80), b = rint(10,40), c = rint(2,9);
+        formula = `${a} － ${b} ＋ ${c} ＝ ?`;
+        ans = a-b+c;
+        problemOptionLabels = numericOptions(ans, [-10,-1,1,10]);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(ans));
+        hintGuide = `💡 －／＋`;
+      } else {
+        const a = rint(2,9), b = rint(2,9), c = rint(1,9);
+        formula = `(${a} ＋ ${b}) × ${c} ＝ ?`;
+        ans = (a+b)*c;
+        problemOptionLabels = numericOptions(ans, [-c,-1,1,c]);
+        problemOptionValues = problemOptionLabels.map(Number);
+        explanation = formula.replace('?', String(ans));
+        hintGuide = `💡 ( )／＋／×`;
+      }
     } else if (grade === 3) {
       if (/數到|以內的數/.test(unit)) { const a=num(1000,9999), b=num(1000,9999); formula=`比較 ${a} 和 ${b}，哪一個比較大？`; ans=Math.max(a,b); explanation=`比較千位、百位、十位與個位即可。`; hintGuide=`💡 從最高位開始比較。`; }
       else if (/加減/.test(unit)) { const a=num(120,8000), b=num(100,Math.min(3000,a)); formula=isHigh?`${a} ＋ ${b} － ${num(20,90)} ＝ ？`:`${a} ＋ ${b} ＝ ？`; ans=isHigh?a+b-num(20,90):a+b; if(isHigh){const c=parseInt(formula.match(/－ (\d+)/)[1]); ans=a+b-c;} explanation=`依序計算即可，答案為 ${ans}。`; hintGuide=`💡 對齊位值再計算。`; }
@@ -3025,11 +3184,11 @@
     document.getElementById("dialog-hint").innerText = `${currentStageObj.version ? "【"+currentStageObj.version+"】 " : ""}第 ${currentQuestionCount} / ${totalStageQuestions} 題｜${tierName}：請計算發動攻擊！`;
     const dialogBox = document.querySelector(".dialog-box");
     if (dialogBox) dialogBox.classList.toggle("grade2-mode", currentGrade === 2);
-    document.getElementById("dialog-formula").innerHTML = currentGrade === 2 ? renderGrade2Zhuyin(currentProblemObj.formula) : escapeHtml(currentProblemObj.formula);
+    document.getElementById("dialog-formula").innerHTML = escapeHtml(currentProblemObj.formula);
 
     const btns = document.querySelectorAll(".choice-btn");
     btns.forEach((btn, idx) => {
-      btn.innerHTML = currentGrade === 2 ? renderGrade2Zhuyin(currentProblemObj.options[idx]) : escapeHtml(currentProblemObj.options[idx]);
+      btn.innerHTML = escapeHtml(currentProblemObj.options[idx]);
       btn.dataset.answerValue = String((currentProblemObj.optionValues && currentProblemObj.optionValues[idx] !== undefined) ? currentProblemObj.optionValues[idx] : currentProblemObj.options[idx]);
       btn.disabled = false;
       btn.style.background = "#e2e8f0";
@@ -3041,7 +3200,13 @@
     isAnswering = true;
 
     const btns = document.querySelectorAll(".choice-btn");
-    const chosenVal = Number(btns[choiceIdx].dataset.answerValue);
+    const rawChosenValue = btns[choiceIdx].dataset.answerValue;
+    const chosenVal = Number(rawChosenValue);
+    const answerVal = Number(currentAns);
+    const numericAnswer = Number.isFinite(chosenVal) && Number.isFinite(answerVal) && rawChosenValue !== "";
+    const answerCorrect = numericAnswer
+      ? Math.abs(chosenVal - answerVal) < 0.01
+      : String(rawChosenValue) === String(currentAns);
     const all = getAllStarters(currentGrade);
     const starter = all[currentStarterKey] || all.ceruledge;
 
@@ -3067,7 +3232,7 @@
       multiplier = TYPE_CHART[pType][oType];
     }
 
-    if (Math.abs(chosenVal - currentAns) < 0.01) {
+    if (answerCorrect) {
       correctCount++;
       currentStreak++;
 
